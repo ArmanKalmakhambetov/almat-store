@@ -1,0 +1,54 @@
+.pizza__item-button {
+    border: none;
+    border-radius: 9999px;;
+    outline: none;
+    height: 40px;
+    padding: 8px 20px;
+    font-size: 16px;
+    line-height: 24px;
+    overflow: hidden;
+
+    background-color: rgb(253, 238, 228);
+    color: rgb(212, 104, 27);
+}
+
+.pizza__item-button:hover {
+    background-color: rgb(253, 208, 178);
+    color: rgb(212, 101, 21);
+}
+
+.pizza__item-start {
+    margin-top: 60px;
+    height: 400px;
+}
+
+.pizza__item-title {
+    margin: 8px 0;
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 500;
+}
+
+.pizza__item-end {
+    margin-top: 16px;
+}
+
+.pizza__item-img {
+    height: 200px;
+    width: 200px;
+}
+
+.pizza__item-img:hover {
+    transform: translate(0,3px);
+}
+
+.pizza__title {
+    font-weight: 600;
+    font-size: 36px;
+
+}
+
+.pizza__img-button {
+    background-color: transparent;
+    border: 0;
+}

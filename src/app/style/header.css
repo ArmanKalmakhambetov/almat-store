@@ -1,0 +1,29 @@
+.header__title {
+    font-weight: 400;
+    font-size: 24px;
+}
+
+.header__text {
+    font-weight: lighter;
+    font-size: 16px;
+}
+
+.header__cart-button {
+    border: none;
+    border-radius: 9999px;;
+    outline: none;
+    height: 40px;
+    padding: 8px 20px;
+    font-size: 16px;
+    line-height: 24px;
+    overflow: hidden;
+
+    background-color: rgb(155, 152, 152);
+    color: rgb(255, 255, 255);
+}
+
+.header__cart-button:hover {
+    background-color: rgba(155, 152, 152, 0.82);
+    color: rgb(255, 255, 255);
+}
+
