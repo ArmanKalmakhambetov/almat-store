@@ -16,12 +16,12 @@ export default function Header() {
 
         <div className="container d-flex justify-content-between align-items-center pt-5 pb-5">
             <div className="header__left align-items-center d-flex gap-4">
-                <button onClick={buttonClickHome} className="">
+                <button onClick={buttonClickHome} className="btn">
                     <div className="header__logo">
                         <Image width="38" src={logo}  alt="logo pizza"/>
                     </div>
                 </button>
-                <button onClick={buttonClickHome} className="">
+                <button onClick={buttonClickHome} className="btn">
                     <div className="header__title">
                         <div className="header__title-text">
                             REACT CABLE

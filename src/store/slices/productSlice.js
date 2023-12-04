@@ -15,7 +15,23 @@ export const userPostsSlice = createSlice({
         addDataToUserCartReducer: (state, action) => {
             state.userCart.push(action.payload);
             console.log(action)
-        }
+        },
+        incrementReducer: (state, action) => {
+            console.log("Action from reducer", action);
+            const existingPostIds = state.userCart.map(post => post.id);
+            const updateData = action.payload.filter(newPost => !existingPostIds.includes(newPost.id));
+            state.userCart.push(...updateData)
+            console.log("arrayCart", state.userCart)
+
+
+
+            // state.userCart.map(item => {
+            //     console.log("Item from Reducer", item)
+            //     // if (item.id == action) {
+            //     //     item.count = action
+            //     // }
+            // })
+        },
         // updatePostLikes: (state, action) => {
         //     // Update the likes count for a specific post
         //     const { postId, likesCount } = action.payload;
@@ -117,12 +133,19 @@ export const userPostsSlice = createSlice({
 }});
 
 
-export const {addDataToUserCartReducer} = userPostsSlice.actions;
+export const {addDataToUserCartReducer, incrementReducer} = userPostsSlice.actions;
 
 export const addToCartProductAction = (item) => async (dispatch) => {
     console.log("Action запустился")
     console.log(item);
     dispatch(addDataToUserCartReducer(item))
+};
+
+export const incrementAction = (updatedData) => async (dispatch) => {
+    console.log("Increment Action запустился")
+
+    dispatch(incrementReducer(updatedData));
+    console.log("Updated data from Action", updatedData)
 };
 
 export const getAllUsersPostsAction=()=>async(dispatch)=>{
