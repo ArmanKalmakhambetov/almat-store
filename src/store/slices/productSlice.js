@@ -17,11 +17,17 @@ export const userPostsSlice = createSlice({
             console.log(action)
         },
         incrementReducer: (state, action) => {
-            console.log("Action from reducer", action);
-            const existingPostIds = state.userCart.map(post => post.id);
-            const updateData = action.payload.filter(newPost => !existingPostIds.includes(newPost.id));
-            state.userCart.push(...updateData)
-            console.log("arrayCart", state.userCart)
+            const { id, updatedData } = action.payload;
+            const existingIds = state.userCart.map(cartItem => cartItem.id);
+
+            if (existingIds.includes(id)) {
+                state.userCart = [...updatedData];
+            }
+            // console.log("Action from reducer", action);
+            // const existingPostIds = state.userCart.map(post => post.id);
+            // const updateData = action.payload.filter(newPost => !existingPostIds.includes(newPost.id));
+            // state.userCart.push(...updateData)
+            // console.log("arrayCart", state.userCart)
 
 
 
@@ -141,10 +147,10 @@ export const addToCartProductAction = (item) => async (dispatch) => {
     dispatch(addDataToUserCartReducer(item))
 };
 
-export const incrementAction = (updatedData) => async (dispatch) => {
+export const incrementAction = (id, updatedData) => async (dispatch) => {
     console.log("Increment Action запустился")
 
-    dispatch(incrementReducer(updatedData));
+    dispatch(incrementReducer({id, updatedData}));
     console.log("Updated data from Action", updatedData)
 };
 
