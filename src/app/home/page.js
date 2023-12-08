@@ -1,6 +1,5 @@
 "use client"
 
-import Header from "@/components/header";
 import Home from "@/components/home";
 import "/src/app/globals.css";
 

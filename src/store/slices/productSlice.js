@@ -38,6 +38,14 @@ export const userPostsSlice = createSlice({
             //     // }
             // })
         },
+        decrementReducer: (state, action) => {
+            const {id, updatedData} = action.payload;
+            const existingIds = state.userCart.map(cartItem => cartItem.id);
+
+            if (existingIds.includes(id)) {
+                state.userCart = [...updatedData];
+            }
+        }
         // updatePostLikes: (state, action) => {
         //     // Update the likes count for a specific post
         //     const { postId, likesCount } = action.payload;
@@ -139,7 +147,7 @@ export const userPostsSlice = createSlice({
 }});
 
 
-export const {addDataToUserCartReducer, incrementReducer} = userPostsSlice.actions;
+export const {addDataToUserCartReducer, incrementReducer, decrementReducer} = userPostsSlice.actions;
 
 export const addToCartProductAction = (item) => async (dispatch) => {
     console.log("Action запустился")
@@ -152,6 +160,13 @@ export const incrementAction = (id, updatedData) => async (dispatch) => {
 
     dispatch(incrementReducer({id, updatedData}));
     console.log("Updated data from Action", updatedData)
+};
+
+export const decrementAction = (id, updatedData) => async (dispatch) => {
+    console.log("Decrement Action запустился")
+
+    dispatch(decrementReducer({id, updatedData}));
+    console.log("Updated data from decrement Action", updatedData)
 };
 
 export const getAllUsersPostsAction=()=>async(dispatch)=>{
