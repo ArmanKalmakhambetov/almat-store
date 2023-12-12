@@ -17,6 +17,11 @@
     color: rgb(212, 101, 21);
 }
 
+.pizza__item-button:disabled {
+    background-color: rgb(189, 189, 189);
+    color: rgb(0, 0, 0);
+}
+
 .pizza__item-start {
     margin-top: 60px;
     height: 400px;

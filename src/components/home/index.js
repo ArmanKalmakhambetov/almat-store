@@ -65,9 +65,11 @@ export default function Pizzas() {
     const filteredCrossOptical = crossOptical.filter(item => item.mainType === selectedMainType);
 
 
-    const buttonClick = (item) => {
+    const buttonClick = (item, event) => {
         dispatch(addToCartProductAction(item))
-        console.log("Item" ,item);
+        event.target.setAttribute("disabled","")
+
+
     }
     return (
         <>
@@ -101,8 +103,8 @@ export default function Pizzas() {
                                     </div>
                                     <div className="pizza__item-end align-items-center d-flex justify-content-between">
                                         <div className="pizza__item-price">Цена: {item.price}</div>
-                                        <button onClick={() => {
-                                            buttonClick(item)
+                                        <button onClick={(e) => {
+                                            buttonClick(item, e)
                                         }} className="pizza__item-button">Выбрать
                                         </button>
                                     </div>
