@@ -1,27 +1,14 @@
-import Image from "next/image";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Header from "@/components/header";
-import img_cross from "/public/image/cable/cros_optical.png";
-import img_cable from "/public/image/cable/img_cable.png";
-import {useDispatch, useSelector} from "react-redux";
-import {addToCartProductAction} from "@/store/slices/productSlice";
-import {useState} from "react";
+// orderDetails/index.js
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllOrdersAction } from '@/store/slices/productSlice';
+import img_cross from "../../../public/image/cable/cros_optical.png";
+import img_cable from "../../../public/image/cable/img_cable.png";
 
-
-export default function Pizzas() {
-    const userCart = useSelector(state => state.userCart || []);
-    console.log(userCart)
-
-    //TODO: очистить корзину
-    //TODO: компонент для вывода всех ордеров и изменение (нужно добавить связь с бэком)
-    //TODO: компонент для создания продукта (нужно добавить связь с бэком)
-    //TODO: аутентификация (будет страница для добавления нового продукта и будет страница где показывать все заказы и там можно будет менять статус заказа)
-    //TODO: сортировка/фильтрация
-    //TODO: корзину и оформление заказа как в леруа
-
-
-
+const OrderDetails = ({ orderId, onGoBack }) => {
     const dispatch = useDispatch();
+    const allOrders = useSelector((state) => state.usercart.allOrders || []);
+    const order = allOrders.find(item => item.id === orderId);
 
     const crossOptical = [
         { id: 1, mainType: 'Кроссы FDF OM4', type: 'Кроссы/Оптические распределительные полки FC/UPC невыдвижные (MM-Многомодовые ОМ4)', name: 'OK-FDF-1U-24-FC ПУСТОЙ', price: 12500, totalPrice: 12500, count: 1, image: img_cross},
@@ -57,64 +44,59 @@ export default function Pizzas() {
         { id: 31, mainType: 'Кабели', type: 'Кабель марки ОКСЛ с броней из стальной гофрированной ленты', name: 'Кабель волоконно-оптический ОКСЛ-М2П-А16-2.7', price: 331, totalPrice: 331, count: 1, image: img_cable },
     ];
 
-    const [selectedMainType, setSelectedMainType] = useState(crossOptical[0].mainType);
+    useEffect(() => {
+        dispatch(getAllOrdersAction());
+    }, [dispatch]);
 
-    const handleNavItemClick = (mainType) => {
-        setSelectedMainType(mainType);
+    // Функция для вызова обратного вызова при нажатии кнопки "Назад"
+    const handleGoBack = () => {
+        onGoBack();
     };
 
-    console.log("Selected Main Type ====", selectedMainType);
-
-    const filteredCrossOptical = crossOptical.filter(item => item.mainType === selectedMainType);
-
-
-    const buttonClick = (item, event) => {
-        dispatch(addToCartProductAction(item))
-        event.target.setAttribute("disabled","")
-    }
     return (
-        <>
-            <Header/>
-            <div className="container">
-                <ul className="nav">
-                    {crossOptical
-                        .filter((item, index, array) => {
-                            return array.findIndex((el) => el.mainType === item.mainType) === index;
-                        })
-                        .map((uniqueItem) => (
-                            <li className="nav-item" key={uniqueItem.id}>
-                                <button onClick={() => {handleNavItemClick(uniqueItem.mainType)}} className="nav-link">{uniqueItem.mainType}</button>
-                            </li>
-                        ))}
-                </ul>
-                <div id="pizza" className="pizza">
-                    <div className="pizza__title">
-                        {selectedMainType}
-                    </div>
-                    <div className="pizza__body row">
-                        {filteredCrossOptical
-                            .map((item, index) => (
-                                <div key={index} className="pizza__item d-flex flex-column gap-5 col-lg-3">
-                                    <div className="pizza__item-start">
-                                        <button className="pizza__img-button">
-                                            <Image src={item.image} alt="Product image" className="pizza__item-img"/>
-                                        </button>
-                                        <div className="pizza__item-title">{item.name}</div>
-                                        <div className="pizza__item-text">Тип: {item.type}</div>
-                                    </div>
-                                    <div className="pizza__item-end align-items-center d-flex justify-content-between">
-                                        <div className="pizza__item-price">Цена: {item.price}</div>
-                                        <button onClick={(e) => {
-                                            buttonClick(item, e)
-                                        }} className="pizza__item-button">Выбрать
-                                        </button>
-                                    </div>
-                                </div>
-                            )
-                        )}
-                    </div>
-                </div>
-            </div>
-        </>
+        <div className="container mt-5">
+            <h2>Детали заказа</h2>
+            <p>Номер заказа: {order.id}</p>
+            <p>Имя: {order.username}</p>
+            <p>Телефон: {order.phone}</p>
+            <p>Адрес доставки: {order.address}</p>
+            <p>Статус заказа: {order.status}</p>
+            <p>Дата создания: {order.createdAt}</p>
+            <p>Общая сумма заказа: {}</p>
+
+            <h3>Товары:</h3>
+            <table className="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Номер</th>
+                    <th>Название продукта</th>
+                    <th>Количество</th>
+                    <th>Цена</th>
+                    <th>Сумма</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {order.product_ids.map((product) => {
+                        const matchedProduct = crossOptical.find(item => item.id === product[0]);
+                        return (
+                            <tr key={product[0]}>
+                                <td>{product[0]}</td>
+                                <td>{matchedProduct ? matchedProduct.name : 'Название не найдено'}</td>
+                                <td>{product[1]}</td>
+                                <td>{matchedProduct ? matchedProduct.price : 'Цена не найдена'}</td>
+                                <td>{matchedProduct ? matchedProduct.price * product[1] : 'Сумма не найдена'}</td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+
+            {/* Добавьте кнопку "Назад" */}
+            <button className="btn btn-primary mb-5 mt-3" onClick={handleGoBack}>
+                Назад к заказам
+            </button>
+        </div>
     );
-}
+};
+
+export default OrderDetails;

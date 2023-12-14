@@ -1,8 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import axios from "axios";
 
-
-
 let initialState = {
     userCart: [],
     allOrders: [],
@@ -207,7 +205,6 @@ export const getAllOrdersAction = () => async (dispatch) => {
 
     try {
         const response = await axios.get(`http://localhost:8000/api/store/allorders`);
-
         console.log(response)
         dispatch(getAllOrdersReducer(response.data));
 

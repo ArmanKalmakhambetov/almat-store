@@ -48,6 +48,7 @@ function ContactForm() {
         console.log(Object.fromEntries(formData))
         console.table(Object.fromEntries(formData))
         dispatch(createOrderAction(Object.fromEntries(formData), userCartIds))
+        setIsDataSent(true)
     }
 
     return (
