@@ -1,9 +1,11 @@
 import {createSlice} from '@reduxjs/toolkit';
+import axios from "axios";
+
 
 
 let initialState = {
     userCart: [],
-    userCartProductsIds: []
+    allOrders: [],
 
 }
 
@@ -46,7 +48,18 @@ export const userPostsSlice = createSlice({
             if (existingIds.includes(id)) {
                 state.userCart = [...updatedData];
             }
-        }
+        },
+        createOrderReducer: (state, action) => {
+
+        },
+        getAllOrdersReducer: (state, action) => {
+            const existingOrders = state.allOrders.map(order => order.id);
+            // Фильтруйте новые посты, чтобы исключить дубликаты
+            const newOrders = action.payload.filter(newOrder => !existingOrders.includes(newOrder.id));
+
+            // Добавьте только новые посты в state.allPosts
+            state.allOrders.push(...newOrders);
+        },
         // updatePostLikes: (state, action) => {
         //     // Update the likes count for a specific post
         //     const { postId, likesCount } = action.payload;
@@ -148,7 +161,7 @@ export const userPostsSlice = createSlice({
 }});
 
 
-export const {addDataToUserCartReducer, incrementReducer, decrementReducer} = userPostsSlice.actions;
+export const {addDataToUserCartReducer, incrementReducer, decrementReducer, getAllOrdersReducer} = userPostsSlice.actions;
 
 export const addToCartProductAction = (item) => async (dispatch) => {
     console.log("Action запустился")
@@ -168,6 +181,40 @@ export const decrementAction = (id, updatedData) => async (dispatch) => {
 
     dispatch(decrementReducer({id, updatedData}));
     console.log("Updated data from decrement Action", updatedData)
+};
+
+export const createOrderAction = (data, userCartIds) => async (dispatch) => {
+    console.log("Create Action запустился", data, userCartIds)
+
+    try {
+        const response = await axios.post(`http://localhost:8000/api/store/createorder`, {
+            username: data.username,
+            phone: data.phone,
+            address: data.address,
+            status: data.status,
+            product_ids: userCartIds
+        })
+        console.log("response from action ", response.data);
+        // dispatch(getAllUsersPostsReducer(response.data));
+
+    } catch (error) { // Handle errors, e.g., by returning an error object
+        throw error;
+    }
+
+};
+
+export const getAllOrdersAction = () => async (dispatch) => {
+
+    try {
+        const response = await axios.get(`http://localhost:8000/api/store/allorders`);
+
+        console.log(response)
+        dispatch(getAllOrdersReducer(response.data));
+
+    } catch (error) { // Handle errors, e.g., by returning an error object
+        throw error;
+    }
+
 };
 
 export const getAllUsersPostsAction=()=>async(dispatch)=>{

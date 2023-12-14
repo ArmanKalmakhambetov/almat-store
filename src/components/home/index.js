@@ -13,9 +13,12 @@ export default function Pizzas() {
     console.log(userCart)
 
     //TODO: очистить корзину
+    //TODO: компонент для вывода всех ордеров и изменение
+    //TODO: компонент для создания продукта
+    //TODO: аутентификация (будет страница для добавления нового продукта и будет страница где показывать все заказы и там можно будет менять статус заказа)
     //TODO: сортировка/фильтрация
     //TODO: корзину и оформление заказа как в леруа
-    //TODO: добавить бэк
+
 
 
     const dispatch = useDispatch();
@@ -68,8 +71,6 @@ export default function Pizzas() {
     const buttonClick = (item, event) => {
         dispatch(addToCartProductAction(item))
         event.target.setAttribute("disabled","")
-
-
     }
     return (
         <>
