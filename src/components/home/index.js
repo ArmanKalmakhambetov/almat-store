@@ -9,10 +9,11 @@ import {useState} from "react";
 
 
 export default function Pizzas() {
+    const [clickCount, setClickCount] = useState(0);
     const userCart = useSelector(state => state.userCart || []);
     console.log(userCart)
+    console.log(clickCount)
 
-    //TODO: очистить корзину
     //TODO: компонент для вывода всех ордеров и изменение (нужно добавить связь с бэком)
     //TODO: компонент для создания продукта (нужно добавить связь с бэком)
     //TODO: аутентификация (будет страница для добавления нового продукта и будет страница где показывать все заказы и там можно будет менять статус заказа)
@@ -69,12 +70,13 @@ export default function Pizzas() {
 
 
     const buttonClick = (item, event) => {
+        setClickCount(clickCount + 1)
         dispatch(addToCartProductAction(item))
-        event.target.setAttribute("disabled","")
     }
+
     return (
         <>
-            <Header/>
+            <Header clickCount = {clickCount}/>
             <div className="container">
                 <ul className="nav">
                     {crossOptical

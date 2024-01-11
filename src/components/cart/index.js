@@ -2,7 +2,7 @@ import {useDispatch, useSelector} from "react-redux";
 import Header from "@/components/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {useEffect, useState} from "react";
-import {incrementAction, decrementAction} from "@/store/slices/productSlice";
+import {incrementAction, decrementAction, clearCartAction} from "@/store/slices/productSlice";
 import {useRouter} from "next/navigation";
 
 
@@ -30,6 +30,8 @@ export default function Cart() {
 
 
 
+
+
     const clickDownCount = (id) => {
         const updatedDataCopy = updatedData.map((item) => {
             if (item.id === id) {
@@ -48,10 +50,16 @@ export default function Cart() {
         router.push("/order")
     }
 
+    const clearCart = () => {
+        dispatch(clearCartAction());
+        setUpdatedData([]);
+    }
+
     return (
         <>
             <Header/>
             <div className="container d-flex flex-column align-items-end">
+                <button onClick={clearCart} style={{"width":"100px"}} className="btn btn-danger">Очистить корзину</button>
                 <table className="table">
                     <thead>
                     <tr>
@@ -82,6 +90,7 @@ export default function Cart() {
                     </tbody>
                 </table>
                 <button onClick={nextClick} style={{"width":"100px"}} className="btn btn-primary">Далее</button>
+
             </div>
         </>
     );

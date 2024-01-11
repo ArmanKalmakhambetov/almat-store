@@ -3,7 +3,9 @@ import logo from '/public/image/cable/cable_logo.png';
 import Image from "next/image";
 import {useRouter} from 'next/navigation';
 
-export default function Header() {
+export default function Header(clickCount) {
+    console.log(clickCount)
+
     const router = useRouter();
     const buttonClick = () => {
         router.push("/cart");
@@ -13,7 +15,6 @@ export default function Header() {
     }
 
     return (
-
         <div className="container d-flex justify-content-between align-items-center pt-5 pb-5">
             <div className="header__left align-items-center d-flex gap-4">
                 <button onClick={buttonClickHome} className="btn">
@@ -33,9 +34,15 @@ export default function Header() {
                 </button>
             </div>
             <div className="header__right">
-                <button onClick={buttonClick} className="header__cart-button">
-                    Корзина
+                {clickCount.clickCount >= 1 ? (
+                    <button onClick={buttonClick} className="header__cart-button">
+                        {clickCount.clickCount} Корзина
+                    </button>
+                ) : (
+                    <button onClick={buttonClick} className="header__cart-button">
+                        Корзина
                 </button>
+                )}
             </div>
         </div>
     );

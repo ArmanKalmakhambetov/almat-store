@@ -58,6 +58,10 @@ export const userPostsSlice = createSlice({
             // Добавьте только новые посты в state.allPosts
             state.allOrders.push(...newOrders);
         },
+
+        clearCartAction: (state) => {
+            state.userCart = [];
+        },
         // updatePostLikes: (state, action) => {
         //     // Update the likes count for a specific post
         //     const { postId, likesCount } = action.payload;
@@ -159,7 +163,7 @@ export const userPostsSlice = createSlice({
 }});
 
 
-export const {addDataToUserCartReducer, incrementReducer, decrementReducer, getAllOrdersReducer} = userPostsSlice.actions;
+export const {addDataToUserCartReducer, incrementReducer, decrementReducer, getAllOrdersReducer, clearCartAction} = userPostsSlice.actions;
 
 export const addToCartProductAction = (item) => async (dispatch) => {
     console.log("Action запустился")
