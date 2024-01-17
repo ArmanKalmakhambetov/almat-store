@@ -1,23 +1,42 @@
 import React, { useState } from 'react';
+import {createProductAction} from "@/store/slices/productSlice";
+import {useDispatch} from "react-redux";
 
 const AddProductForm = () => {
-
     const [productMainType, setProductMainType] = useState('');
     const [productType, setProductType] = useState('');
     const [productName, setProductName] = useState('');
     const [productPrice, setProductPrice] = useState('');
-    const [productImage, setProductImage] = useState('');
+    const [productImage, setProductImage] = useState(''); // Состояние для хранения файла
+    const dispatch = useDispatch();
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        console.log('Product added:', { productMainType, productType, productName, productPrice, productImage });
+        const formData = new FormData();
+        formData.append('productMainType', productMainType);
+        formData.append('productType', productType);
+        formData.append('productName', productName);
+        formData.append('productPrice', productPrice);
+        // formData.append('productImage', productImage);
+
+
+        console.log({productPrice})
+        console.log(Object.fromEntries(formData))
+
+        dispatch(createProductAction(Object.fromEntries(formData)));
 
         setProductName('');
         setProductMainType('');
         setProductType('');
         setProductPrice('');
-        setProductImage('');
+        // setProductImage(null);
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        setProductImage(file);
     };
 
     return (
@@ -70,17 +89,17 @@ const AddProductForm = () => {
                                 required
                             />
                         </div>
-                        <div className="mb-3">
-                            <label htmlFor="productImage" className="form-label">Ссылка на изображение:</label>
-                            <input
-                                type="text"
-                                id="productImage"
-                                className="form-control"
-                                value={productImage}
-                                onChange={(e) => setProductImage(e.target.value)}
-                                required
-                            />
-                        </div>
+                        {/*<div className="mb-3">*/}
+                        {/*    <label htmlFor="productImage" className="form-label">Выберите изображение:</label>*/}
+                        {/*    <input*/}
+                        {/*        type="file"*/}
+                        {/*        id="productImage"*/}
+                        {/*        className="form-control"*/}
+                        {/*        onChange={handleFileChange}*/}
+                        {/*        accept="image/*" // Только изображения*/}
+                        {/*        required*/}
+                        {/*    />*/}
+                        {/*</div>*/}
                         <button type="submit" className="btn btn-primary">Добавить продукт</button>
                     </form>
                 </div>

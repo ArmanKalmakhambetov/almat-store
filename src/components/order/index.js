@@ -10,9 +10,10 @@ export default function Order() {
     const dispatch = useDispatch();
     const router = useRouter();
     let total = 0;
+    console.log(data);
 
     data.map(item => {
-        total += item.totalPrice;
+        total += item.count * item.price;
     })
 
 
@@ -21,7 +22,7 @@ export default function Order() {
             <Header/>
             <div className="container d-flex gap-5">
                 <div style={{"width":"500px"}}>
-                    <ContactForm/>
+                    <ContactForm total={total}/>
                 </div>
                 <table className="table">
                     <thead>
@@ -42,7 +43,7 @@ export default function Order() {
                                 <td>{item.type}</td>
                                 <td>{item.price}</td>
                                 <td className="text-center">{item.count}</td>
-                                <td>{item.totalPrice}</td>
+                                <td>{item.price * item.count}</td>
                             </tr>
                         </>
                     ))}

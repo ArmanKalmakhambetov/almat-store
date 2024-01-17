@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {createOrderAction} from "@/store/slices/productSlice";
 
 
-function ContactForm() {
+function ContactForm(total) {
     const [isDataSent, setIsDataSent] = useState(false);
     const userCart = useSelector(state => state.usercart.userCart)
     console.log(userCart)
@@ -17,7 +17,6 @@ function ContactForm() {
         const temp = []
         temp.push(item.id, item.count)
         userCartIds.push(temp)
-
     })
 
     const handleChange = (e) => {
@@ -44,9 +43,7 @@ function ContactForm() {
         formData.append('phone', phone);
         formData.append('address', address);
         formData.append('status', "создан");
-
-        console.log(Object.fromEntries(formData))
-        console.table(Object.fromEntries(formData))
+        formData.append('totalPrice', total.total);
         dispatch(createOrderAction(Object.fromEntries(formData), userCartIds))
         setIsDataSent(true)
     }

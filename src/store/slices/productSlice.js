@@ -3,6 +3,7 @@ import axios from "axios";
 
 let initialState = {
     userCart: [],
+    allProducts: [],
     allOrders: [],
 
 }
@@ -58,6 +59,15 @@ export const userPostsSlice = createSlice({
             // Добавьте только новые посты в state.allPosts
             state.allOrders.push(...newOrders);
         },
+        getAllProductsReducer: (state, action) => {
+            const existingProducts = state.allProducts.map(product => product.id);
+            // Фильтруйте новые посты, чтобы исключить дубликаты
+            const newProducts = action.payload.filter(newProduct => !existingProducts.includes(newProduct.id));
+
+            // Добавьте только новые посты в state.allPosts
+            state.allProducts.push(...newProducts);
+        },
+
 
         clearCartAction: (state) => {
             state.userCart = [];
@@ -163,7 +173,7 @@ export const userPostsSlice = createSlice({
 }});
 
 
-export const {addDataToUserCartReducer, incrementReducer, decrementReducer, getAllOrdersReducer, clearCartAction} = userPostsSlice.actions;
+export const {addDataToUserCartReducer, incrementReducer, decrementReducer, getAllOrdersReducer, clearCartAction, getAllProductsReducer} = userPostsSlice.actions;
 
 export const addToCartProductAction = (item) => async (dispatch) => {
     console.log("Action запустился")
@@ -194,7 +204,8 @@ export const createOrderAction = (data, userCartIds) => async (dispatch) => {
             phone: data.phone,
             address: data.address,
             status: data.status,
-            product_ids: userCartIds
+            product_ids: userCartIds,
+            totalPrice: data.totalPrice
         })
         console.log("response from action ", response.data);
         // dispatch(getAllUsersPostsReducer(response.data));
@@ -205,12 +216,43 @@ export const createOrderAction = (data, userCartIds) => async (dispatch) => {
 
 };
 
+export const createProductAction = (data) => async (dispatch) => {
+    console.log('Create Product Action запустился' ,data.productMainType)
+    try {
+        const response = await axios.post(`http://localhost:8000/api/store/createproduct`, {
+            mainType: data.productMainType,
+            type: data.productType,
+            name: data.productName,
+            price: data.productPrice,
+        })
+        console.log("response from action ", response.data);
+
+    } catch (error) { // Handle errors, e.g., by returning an error object
+        throw error;
+    }
+
+};
+
+
+
 export const getAllOrdersAction = () => async (dispatch) => {
 
     try {
         const response = await axios.get(`http://localhost:8000/api/store/allorders`);
-        console.log(response)
         dispatch(getAllOrdersReducer(response.data));
+
+    } catch (error) { // Handle errors, e.g., by returning an error object
+        throw error;
+    }
+
+};
+
+export const getAllProductsAction = () => async (dispatch) => {
+
+    try {
+        const response = await axios.get(`http://localhost:8000/api/store/allproducts`);
+        console.log(response.data)
+        dispatch(getAllProductsReducer(response.data));
 
     } catch (error) { // Handle errors, e.g., by returning an error object
         throw error;

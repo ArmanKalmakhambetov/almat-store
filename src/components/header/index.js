@@ -36,11 +36,16 @@ export default function Header(clickCount) {
             <div className="header__right">
                 {clickCount.clickCount >= 1 ? (
                     <button onClick={buttonClick} className="header__cart-button">
-                        {clickCount.clickCount} Корзина
+                        Корзина
+                        <div className='inMods'> </div>
+                        <div>{clickCount.clickCount} </div>
                     </button>
                 ) : (
                     <button onClick={buttonClick} className="header__cart-button">
-                        Корзина
+                        <div className='d-flex gap-2 justify-content-center'>
+                            {/*<Image src={cartLogo} alt='cart logo'></Image>*/}
+                            Корзина
+                        </div>
                 </button>
                 )}
             </div>

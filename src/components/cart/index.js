@@ -1,13 +1,15 @@
 import {useDispatch, useSelector} from "react-redux";
 import Header from "@/components/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {incrementAction, decrementAction, clearCartAction} from "@/store/slices/productSlice";
 import {useRouter} from "next/navigation";
+import cartLogo from "../../../public/image/cart/d-cart.c259d025.svg"
+import Image from "next/image";
 
 
 export default function Cart() {
-    const data = useSelector((state) => state.usercart.userCart);
+    const data = useSelector((state) => state.usercart.userCart) || null;
     const [updatedData, setUpdatedData] = useState(data);
     console.log("Data",data)
     const dispatch = useDispatch();
@@ -58,8 +60,10 @@ export default function Cart() {
     return (
         <>
             <Header/>
-            <div className="container d-flex flex-column align-items-end">
-                <button onClick={clearCart} style={{"width":"100px"}} className="btn btn-danger">Очистить корзину</button>
+            {
+                data.length >= 1 ? (
+                    <div className="container d-flex flex-column align-items-end">
+                <button onClick={clearCart} style={{"width":"100px"}} className="btn btn-danger">Очистить</button>
                 <table className="table">
                     <thead>
                     <tr>
@@ -72,26 +76,33 @@ export default function Cart() {
                     </tr>
                     </thead>
                     <tbody>
-                        {updatedData.map((item, index) => (
-                            <tr className="" key={item.id}>
-                                <td>{item.name}</td>
-                                <td>{item.type}</td>
-                                <td>{item.price}</td>
-                                <td className="text-center">{item.count}</td>
-                                <td>
-                                    <button className="btn" onClick={() => clickUpCount(item.id)}>+</button>
-                                    <button className="btn" onClick={() => clickDownCount(item.id)}>-</button>
-                                </td>
-                                <td>
-                                    {item.totalPrice}
-                                </td>
-                            </tr>
-                        ))}
+                    {updatedData.map((item, index) => (
+                        <tr className="" key={item.id}>
+                            <td>{item.name}</td>
+                            <td>{item.type}</td>
+                            <td>{item.price}</td>
+                            <td className="text-center">{item.count}</td>
+                            <td>
+                                <button className="btn" onClick={() => clickUpCount(item.id)}>+</button>
+                                <button className="btn" onClick={() => clickDownCount(item.id)}>-</button>
+                            </td>
+                            <td>
+                                {item.price * item.count}
+                            </td>
+                        </tr>
+                    ))}
                     </tbody>
                 </table>
                 <button onClick={nextClick} style={{"width":"100px"}} className="btn btn-primary">Далее</button>
-
             </div>
+                ) : (
+                <div className="container d-flex align-items-center justify-content-center gap-5">
+                    <Image style={{'width':'100px', 'height':'100px'}} src={cartLogo} alt="cart logo"/>
+                    <div>
+                        <div className='fs-2'>В корзине нет товаров(</div>
+                    </div>
+                </div>
+                )}
         </>
     );
 }
