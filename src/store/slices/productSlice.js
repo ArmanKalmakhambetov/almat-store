@@ -5,6 +5,8 @@ let initialState = {
     userCart: [],
     allProducts: [],
     allOrders: [],
+    isAuth: false,
+    order: {},
 
 }
 
@@ -19,7 +21,7 @@ export const userPostsSlice = createSlice({
             console.log(action)
         },
         incrementReducer: (state, action) => {
-            const { id, updatedData } = action.payload;
+            const {id, updatedData} = action.payload;
             const existingIds = state.userCart.map(cartItem => cartItem.id);
 
             if (existingIds.includes(id)) {
@@ -30,7 +32,6 @@ export const userPostsSlice = createSlice({
             // const updateData = action.payload.filter(newPost => !existingPostIds.includes(newPost.id));
             // state.userCart.push(...updateData)
             // console.log("arrayCart", state.userCart)
-
 
 
             // state.userCart.map(item => {
@@ -48,9 +49,6 @@ export const userPostsSlice = createSlice({
                 state.userCart = [...updatedData];
             }
         },
-        createOrderReducer: (state, action) => {
-
-        },
         getAllOrdersReducer: (state, action) => {
             const existingOrders = state.allOrders.map(order => order.id);
             // Фильтруйте новые посты, чтобы исключить дубликаты
@@ -66,6 +64,14 @@ export const userPostsSlice = createSlice({
 
             // Добавьте только новые посты в state.allPosts
             state.allProducts.push(...newProducts);
+        },
+        getOrderReducer: (state, action) => {
+            state.order = action.payload
+            console.log(state.order)
+        },
+
+        isAuthReducer: (state, action) => {
+            state.isAuth = action.payload;
         },
 
 
@@ -100,7 +106,7 @@ export const userPostsSlice = createSlice({
         //     // state.allPosts.push(null)
         //     console.log('11111AllPosts data =', data.payload)
         //     state.allPosts.push(...data.payload);
-        
+
         //     // data.payload.forEach(newPost => {
         //     //     if (!state.allPosts.some(existingPost => existingPost.id === newPost.id)) {
         //     //       state.allPosts.push(newPost);
@@ -169,11 +175,21 @@ export const userPostsSlice = createSlice({
         //     state.followedUsers = action.payload;
         //   },
 
-      
-}});
+
+    }
+});
 
 
-export const {addDataToUserCartReducer, incrementReducer, decrementReducer, getAllOrdersReducer, clearCartAction, getAllProductsReducer} = userPostsSlice.actions;
+export const {
+    addDataToUserCartReducer,
+    incrementReducer,
+    decrementReducer,
+    getAllOrdersReducer,
+    clearCartAction,
+    getAllProductsReducer,
+    isAuthReducer,
+    getOrderReducer,
+} = userPostsSlice.actions;
 
 export const addToCartProductAction = (item) => async (dispatch) => {
     console.log("Action запустился")
@@ -186,6 +202,13 @@ export const incrementAction = (id, updatedData) => async (dispatch) => {
 
     dispatch(incrementReducer({id, updatedData}));
     console.log("Updated data from Action", updatedData)
+};
+
+export const isAuthAction = (isAuth) => async (dispatch) => {
+    console.log("is Auth Action запустился")
+
+    dispatch(isAuthReducer(isAuth));
+
 };
 
 export const decrementAction = (id, updatedData) => async (dispatch) => {
@@ -216,8 +239,27 @@ export const createOrderAction = (data, userCartIds) => async (dispatch) => {
 
 };
 
+export const editOrderAction = (data, orderId) => async (dispatch) => {
+    console.log("Edit Order Action запустился", data)
+
+    try {
+        const response = await axios.post(`http://localhost:8000/api/store/order/${orderId}/editorder`, {
+            username: data.username,
+            phone: data.phone,
+            address: data.address,
+            status: data.status,
+            totalPrice: data.totalPrice,
+        })
+        console.log("response from edit order action ", response.data);
+
+    } catch (error) { // Handle errors, e.g., by returning an error object
+        throw error;
+    }
+
+};
+
 export const createProductAction = (data) => async (dispatch) => {
-    console.log('Create Product Action запустился' ,data.productMainType)
+    console.log('Create Product Action запустился', data.productMainType)
     try {
         const response = await axios.post(`http://localhost:8000/api/store/createproduct`, {
             mainType: data.productMainType,
@@ -232,7 +274,6 @@ export const createProductAction = (data) => async (dispatch) => {
     }
 
 };
-
 
 
 export const getAllOrdersAction = () => async (dispatch) => {
@@ -260,11 +301,24 @@ export const getAllProductsAction = () => async (dispatch) => {
 
 };
 
-export const getAllUsersPostsAction=()=>async(dispatch)=>{
+export const getOrderAction = (orderId) => async (dispatch) => {
+
+    try {
+        const response = await axios.get(`http://localhost:8000/api/store/order/${orderId}`);
+        console.log(response.data)
+        dispatch(getOrderReducer(response.data));
+
+    } catch (error) { // Handle errors, e.g., by returning an error object
+        throw error;
+    }
+
+};
+
+export const getAllUsersPostsAction = () => async (dispatch) => {
     console.log('1 getAllUserPostsAction STARTED');
-    
+
     const token = localStorage.getItem('token');
-    
+
     // console.log('2 getUsersPosts token=', token);
     let decodedToken = jwt_decode(token)
     // console.log('3 getUsersPosts decoded=', decodedToken.username);
@@ -283,7 +337,7 @@ export const getAllUsersPostsAction=()=>async(dispatch)=>{
         });
         // console.log('response from axios=',response.data)
         dispatch(getAllUsersPostsReducer(response.data));
-        
+
 
     } catch (error) { // Handle errors, e.g., by returning an error object
         throw error;
@@ -291,8 +345,7 @@ export const getAllUsersPostsAction=()=>async(dispatch)=>{
 }
 
 
-
-export const getAllUsersAction=()=>async(dispatch)=>{
+export const getAllUsersAction = () => async (dispatch) => {
     // console.log('1 getAllUserPostsAction STARTED');
     const token = localStorage.getItem('token');
 
@@ -315,23 +368,23 @@ export const getAllUsersAction=()=>async(dispatch)=>{
     // console.log('response from axios=',response.data)
     dispatch(getAllUsersReducer(response.data));
 
-    
+
 }
 
 export const showAllUserPosts = () => async (dispatch) => {
     const token = localStorage.getItem("token");
     const response = await axios.get('http://157.245.193.184:3002/api/post', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-                // console.log('response data', response.data)
-                dispatch(showAllUserPostsReducer(response.data))
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    // console.log('response data', response.data)
+    dispatch(showAllUserPostsReducer(response.data))
 }
 
-export const addPostLikeAction=(post)=> async (dispatch)=>{
+export const addPostLikeAction = (post) => async (dispatch) => {
     // console.log('1 addPostLikeAction STARTED',post);
-   
+
     // console.log('2 addPostLikeAction POSTID',postId);
 
     const token = localStorage.getItem('token');
@@ -346,81 +399,64 @@ export const addPostLikeAction=(post)=> async (dispatch)=>{
     }
 
 
-    
     const response = await axios.post(`${END_POINT}/api/like/post/${post.id}`, {
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
         }
     });
-    console.log('3 addPostLikeAction response from axios=',response.data)
+    console.log('3 addPostLikeAction response from axios=', response.data)
     dispatch(addPostLikeReducer(response.data));
 
 
-    
 }
 
 
-
-
-
 export const followUserAction = (userId) => async (dispatch) => {
-  
+
     const token = localStorage.getItem('token');
 
     if (!token) {
-      console.error('Token not available');
-      return;
+        console.error('Token not available');
+        return;
     }
-  
+
     try {
-      // Perform the follow action using the token
-      const response = await axios.post(`${END_POINT}/api/follow/${userId}`,null, {headers: {Authorization: `Bearer ${token}`}});
-  
-      // Assuming the response contains the updated list of followed users
-      dispatch(followUserReducer(response.data));
+        // Perform the follow action using the token
+        const response = await axios.post(`${END_POINT}/api/follow/${userId}`, null, {headers: {Authorization: `Bearer ${token}`}});
+
+        // Assuming the response contains the updated list of followed users
+        dispatch(followUserReducer(response.data));
     } catch (error) {
-      console.error('Error following user:', error);
+        console.error('Error following user:', error);
     }
-  };
+};
 
 
-
-
-export const unfollowUserAction=(userId)=> async (dispatch)=>{
+export const unfollowUserAction = (userId) => async (dispatch) => {
     const token = localStorage.getItem('token');
 
     if (!token) {
-      console.error('Token not available');
-      return;
+        console.error('Token not available');
+        return;
     }
-  
+
     // console.log('token when unfollow= ',token)
     try {
-      // Perform the follow action using the token
-      const response = await axios.delete(`${END_POINT}/api/unfollow/${String(userId)}`,{headers: {Authorization: `Bearer ${token}`}});
-  
-      // Assuming the response contains the updated list of followed users
-      dispatch(unfollowUserReducer(response.data));
+        // Perform the follow action using the token
+        const response = await axios.delete(`${END_POINT}/api/unfollow/${String(userId)}`, {headers: {Authorization: `Bearer ${token}`}});
+
+        // Assuming the response contains the updated list of followed users
+        dispatch(unfollowUserReducer(response.data));
     } catch (error) {
-      console.error('Error following user:', error);
+        console.error('Error following user:', error);
     }
-  };
-
-      
-    
+};
 
 
+export const addPostCommentAction = (comment, post) => async (dispatch) => {
+    console.log('1 addPostCommentAction STARTED', comment, 'postID=', post.id);
 
-
-
-
-
-
-
-export const addPostCommentAction=(comment,post)=> async (dispatch)=>{
-    console.log('1 addPostCommentAction STARTED',comment,'postID=',post.id);
- 
     // console.log('2 addPostLikeAction POSTID',postId);
 
     const token = localStorage.getItem('token');
@@ -432,27 +468,18 @@ export const addPostCommentAction=(comment,post)=> async (dispatch)=>{
         return;
     }
 
-    
-    const response = await axios.post(`${END_POINT}/api/comment/${post.id}`, {commentary:comment},{
+
+    const response = await axios.post(`${END_POINT}/api/comment/${post.id}`, {commentary: comment}, {
         headers: {
             'Authorization': `Bearer ${token}`,
-          
+
         }
     });
-    console.log('3 addPostLikeAction response from axios=',response.data)
+    console.log('3 addPostLikeAction response from axios=', response.data)
     dispatch(addPostCommentaryReducer(response.data));
 
 
-    
 }
-
-
-
-
-
-
-
-
 
 
 // export const createUser = (email, name, password, username) => (dispatch) => {

@@ -1,6 +1,7 @@
 import {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {createOrderAction} from "@/store/slices/productSlice";
+import {Button} from "@mui/material";
 
 
 function ContactForm(total) {
@@ -72,9 +73,9 @@ function ContactForm(total) {
                                    placeholder="Адрес доставки" type="text"/>
                         </div>
                         <div className="p-3">
-                            <button className="btn btn-primary" type="submit">
+                            <Button type="submit">
                                 Отправить
-                            </button>
+                            </Button>
                         </div>
                     </form>
                 </div>

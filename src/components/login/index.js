@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from "axios";
 import {useRouter} from "next/navigation";
+import {useDispatch, useSelector} from "react-redux";
+import {isAuthAction} from "@/store/slices/productSlice";
 export default function Login() {
+    const dispatch = useDispatch();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const router = useRouter();
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -15,12 +19,14 @@ export default function Login() {
             const response = await axios.post('http://localhost:8000/api/store/login', { username, password });
             console.log('Успешный вход:', response.data.message);
             setError(null);
-
+            router.push('/admin')
+            dispatch(isAuthAction(true))
         } catch (error) {
             console.error('Ошибка входа:', error.response.data.message);
             setError('Неверные учетные данные');
+
         }
-        router.push('/admin')
+
     };
 
     return (

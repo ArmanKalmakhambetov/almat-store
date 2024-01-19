@@ -1,93 +1,90 @@
-import Image from "next/image";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Header from "@/components/header";
-import { getAllProductsAction} from '@/store/slices/productSlice';
-import {useDispatch, useSelector} from "react-redux";
-import {addToCartProductAction} from "@/store/slices/productSlice";
-import {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {Button, Container, Typography, Divider, ThemeProvider, createTheme, Stack} from "@mui/material";
 import img_cross from '../../../../store-back/public/cable/cros_optical.png';
-import img_cable from '../../../../store-back/public/cable/img_cable.png';
+import Header from "@/components/header";
+import { getAllProductsAction, addToCartProductAction} from '@/store/slices/productSlice';
+import Image from "next/image";
+
+const theme = createTheme();
 
 export default function Pizzas() {
-
     const dispatch = useDispatch();
     const [clickCount, setClickCount] = useState(0);
-    const crossOptical = useSelector(state => state.usercart.allProducts);
-    const uniqueMainTypes = [...new Set(crossOptical.map(item => item.mainType))];
+    const crossOptical = useSelector((state) => state.usercart.allProducts);
+    const uniqueMainTypes = [...new Set(crossOptical.map((item) => item.mainType))];
     const [selectedMainType, setSelectedMainType] = useState('');
-
 
     useEffect(() => {
         dispatch(getAllProductsAction());
-        setSelectedMainType(uniqueMainTypes[0])
+        setSelectedMainType(uniqueMainTypes[0]);
     }, [crossOptical]);
-
-
-    //TODO: компонент для вывода всех ордеров и изменение (нужно добавить связь с бэком)
-    //TODO: компонент для создания продукта (нужно добавить связь с бэком)
-    //TODO: аутентификация (будет страница для добавления нового продукта и будет страница где показывать все заказы и там можно будет менять статус заказа)
-    //TODO: сортировка/фильтрация
-    //TODO: корзину и оформление заказа как в леруа
-    //TODO: разобраться с отображением изображений из базы
-    //TODO: поиск по заказам, фильтрация и сортировка
 
     const handleNavItemClick = (mainType) => {
         setSelectedMainType(mainType);
     };
 
-    console.log("Selected Main Type ====", selectedMainType);
+    const filteredCrossOptical = crossOptical.filter((item) => item.mainType === selectedMainType);
 
-    const filteredCrossOptical = crossOptical.filter(item => item.mainType === selectedMainType);
-
-
-    const buttonClick = (item, event) => {
-        setClickCount(clickCount + 1)
-        dispatch(addToCartProductAction(item))
-    }
+    const buttonClick = (item) => {
+        setClickCount(clickCount + 1);
+        dispatch(addToCartProductAction(item));
+    };
 
     return (
-        <>
-            <Header clickCount = {clickCount}/>
-            <div className="container">
-                <ul className="nav">
-                    {crossOptical
-                        .filter((item, index, array) => {
-                            return array.findIndex((el) => el.mainType === item.mainType) === index;
-                        })
-                        .map((uniqueItem) => (
-                            <li className="nav-item" key={uniqueItem.id}>
-                                <button onClick={() => {handleNavItemClick(uniqueItem.mainType)}} className="nav-link">{uniqueItem.mainType}</button>
-                            </li>
-                        ))}
-                </ul>
-                <div id="pizza" className="pizza">
-                    <div className="pizza__title">
-                        {selectedMainType}
-                    </div>
-                    <div className="pizza__body row">
-                        {filteredCrossOptical
-                            .map((item, index) => (
+        <ThemeProvider theme={theme}>
+            <>
+                <Header clickCount={clickCount} />
+                <Container>
+                    <Stack direction="row" spacing={2}>
+                        {crossOptical
+                            .filter((item, index, array) => array.findIndex((el) => el.mainType === item.mainType) === index)
+                            .map((uniqueItem) => (
+                                <Button key={uniqueItem.id} onClick={() => handleNavItemClick(uniqueItem.mainType)}>
+                                    {uniqueItem.mainType}
+                                </Button>
+                            ))}
+                    </Stack>
+                    <Divider />
+                    <div className="pizza">
+                        <Typography variant="h4" className="pizza__title">
+                            {selectedMainType}
+                        </Typography>
+                        <div className="pizza__body row">
+                            {filteredCrossOptical.map((item, index) => (
                                 <div key={index} className="pizza__item d-flex flex-column gap-5 col-lg-3">
                                     <div className="pizza__item-start">
-                                        <button className="pizza__img-button">
-                                            <Image src={img_cross} width={200} height={200} alt="Product image"/>
-                                        </button>
-                                        <div className="pizza__item-title">{item.name}</div>
-                                        <div className="pizza__item-text">Тип: {item.type}</div>
+                                        <Button className="pizza__img-button">
+                                            <Image src={img_cross} width={200} height={200} alt="Product image" />
+                                        </Button>
+                                        <Typography variant="h6" className="pizza__item-title">
+                                            {item.name}
+                                        </Typography>
+                                        <Typography variant="body2" className="pizza__item-text">
+                                            Тип: {item.type}
+                                        </Typography>
                                     </div>
                                     <div className="pizza__item-end align-items-center d-flex justify-content-between">
-                                        <div className="pizza__item-price">Цена: {item.price}</div>
-                                        <button onClick={(e) => {
-                                            buttonClick(item, e)
-                                        }} className="pizza__item-button">Выбрать
-                                        </button>
+                                        <Typography variant="body1" className="pizza__item-price">
+                                            Цена: {item.price}
+                                        </Typography>
+                                        <Button onClick={() => buttonClick(item)} className="pizza__item-button">
+                                            Выбрать
+                                        </Button>
                                     </div>
                                 </div>
-                            )
-                        )}
+                            ))}
+                        </div>
                     </div>
-                </div>
-            </div>
-        </>
+                </Container>
+            </>
+        </ThemeProvider>
     );
 }
+
+//TODO: поиск по заказам, фильтрация и сортировка
+//TODO: обновление в реальном времени заказа
+//TODO: сортировка/фильтрация и поиск
+//TODO: корзину и оформление заказа как в леруа
+//TODO: разобраться с отображением изображений из базы
+//TODO: Создать переменную в product slice url и проставить его во всех запросах

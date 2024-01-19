@@ -1,59 +1,59 @@
-import {useDispatch, useSelector} from "react-redux";
-import Header from "@/components/header";
+import { useDispatch, useSelector } from 'react-redux';
+import Header from '@/components/header';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {useRouter} from "next/navigation";
-import ContactForm from "@/components/contacts";
-
+import { useRouter } from 'next/navigation';
+import ContactForm from '@/components/contacts';
+import {
+    Container,
+    Table,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+} from '@mui/material';
 
 export default function Order() {
     const data = useSelector((state) => state.usercart.userCart);
     const dispatch = useDispatch();
     const router = useRouter();
     let total = 0;
-    console.log(data);
 
-    data.map(item => {
+    data.forEach((item) => {
         total += item.count * item.price;
-    })
-
+    });
 
     return (
         <>
-            <Header/>
-            <div className="container d-flex gap-5">
-                <div style={{"width":"500px"}}>
-                    <ContactForm total={total}/>
+            <Header />
+            <Container sx={{ display: 'flex', gap: '5' }}>
+                <div style={{ width: '500px' }}>
+                    <ContactForm total={total} />
                 </div>
-                <table className="table">
-                    <thead>
-                    <tr>
-                        <th>Название</th>
-                        <th>Тип</th>
-                        <th>Цена</th>
-                        <th>Количество</th>
-                        <th>Сумма</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {data.map((item, index) => (
-                        <>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Название</TableCell>
+                            <TableCell>Тип</TableCell>
+                            <TableCell>Цена</TableCell>
+                            <TableCell>Количество</TableCell>
+                            <TableCell>Сумма</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {data.map((item, index) => (
+                            <TableRow key={item.id}>
+                                <TableCell>{item.name}</TableCell>
+                                <TableCell>{item.type}</TableCell>
+                                <TableCell>{item.price}</TableCell>
+                                <TableCell align="center">{item.count}</TableCell>
+                                <TableCell>{item.price * item.count}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                    <div className="mt-5">Итог: {total}</div>
+                </Table>
 
-                            <tr className="" key={item.id}>
-                                <td>{item.name}</td>
-                                <td>{item.type}</td>
-                                <td>{item.price}</td>
-                                <td className="text-center">{item.count}</td>
-                                <td>{item.price * item.count}</td>
-                            </tr>
-                        </>
-                    ))}
-                    </tbody>
-                    <div className="mt-5">
-                        Итог: {total}
-                    </div>
-                </table>
-
-            </div>
+            </Container>
         </>
     );
 }

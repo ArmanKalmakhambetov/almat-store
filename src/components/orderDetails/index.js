@@ -1,67 +1,172 @@
-// orderDetails/index.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {getAllOrdersAction, getAllProductsAction} from '@/store/slices/productSlice';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import {editOrderAction, getAllOrdersAction, getAllProductsAction, getOrderAction} from '@/store/slices/productSlice';
+import {
+    Container,
+    Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Button, TextField,
+} from '@mui/material';
+const theme = createTheme();
 
 const OrderDetails = ({ orderId, onGoBack }) => {
     const dispatch = useDispatch();
     const crossOptical = useSelector(state => state.usercart.allProducts);
     const allOrders = useSelector((state) => state.usercart.allOrders || []);
+    const orderFromDb = useSelector(state => state.usercart.order[0]);
     const order = allOrders.find(item => item.id === orderId);
+    const [isEdit, setIsEdit] = useState(false);
+    const [editedOrder, setEditedOrder] = useState({
+        username: order.username,
+        phone: order.phone,
+        address: order.address,
+        status: order.status,
+        totalPrice: order.totalPrice,
+    });
 
     useEffect(() => {
         dispatch(getAllOrdersAction());
         dispatch(getAllProductsAction());
-    }, [dispatch, crossOptical]);
+        dispatch(getOrderAction(orderId))
+    }, [dispatch, allOrders]);
 
-    // Функция для вызова обратного вызова при нажатии кнопки "Назад"
+
+
+    // Function to trigger the callback when the "Go Back" button is clicked
     const handleGoBack = () => {
         onGoBack();
     };
 
+    const editOrder = () => {
+        dispatch(editOrderAction(editedOrder, orderId));
+        dispatch(getOrderAction(orderId))
+        setIsEdit(false);
+    };
+
+    const setButton = () => {
+        setIsEdit(true);
+    };
+
+    const handleInputChange = (field, value) => {
+        setEditedOrder(prevState => ({ ...prevState, [field]: value }));
+    };
+
+    const renderOrderDetails = () => (
+        <Container>
+            <Typography variant="h4">Детали заказа</Typography>
+            <Typography className='mb-3 mt-3'>Номер заказа: {order.id}</Typography>
+            <Typography className='mb-3'>Имя: {order.username}</Typography>
+            <Typography className='mb-3'>Телефон: {order.phone}</Typography>
+            <Typography className='mb-3'>Адрес доставки: {order.address}</Typography>
+            <Typography className='mb-3'>Статус заказа: {order.status}</Typography>
+            <Typography className='mb-3'>Дата создания: {order.createdAt}</Typography>
+            <Typography className='mb-3'>Общая сумма заказа: {order.totalPrice}</Typography>
+        </Container>
+    );
+
+    const renderEditableOrderDetails = () => (
+        <Container>
+            <Typography variant="h4">Детали заказа</Typography>
+            <Typography className='mb-3 mt-3'>Номер заказа: {order.id}</Typography>
+            <Typography className='mb-3 '>
+                <TextField
+                    defaultValue={order.username}
+                    label="Имя"
+                    onChange={(e) => handleInputChange('username', e.target.value)}
+                    className='mb-3'
+                />
+            </Typography>
+            <Typography className='mb-3'>
+                <TextField
+                    label="Телефон"
+                    defaultValue={order.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    className='mb-3'
+                />
+            </Typography>
+            <Typography className='mb-3'>
+                <TextField
+                    label="Адрес доставки"
+                    defaultValue={order.address}
+                    onChange={(e) => handleInputChange('address', e.target.value)}
+                    className='mb-3'
+                />
+            </Typography>
+            <Typography className='mb-3'>
+                <TextField
+                    label="Статус заказа"
+                    defaultValue={order.status}
+                    onChange={(e) => handleInputChange('status', e.target.value)}
+                    className='mb-3'
+                />
+            </Typography>
+            <Typography className='mb-3'>
+                <TextField
+                    label="Общая сумма"
+                    defaultValue={order.totalPrice}
+                    onChange={(e) => handleInputChange('totalPrice', e.target.value)}
+                    className='mb-3'
+                />
+            </Typography>
+        </Container>
+    );
+
     return (
-        <div className="container mt-5">
-            <h2>Детали заказа</h2>
-            <p>Номер заказа: {order.id}</p>
-            <p>Имя: {order.username}</p>
-            <p>Телефон: {order.phone}</p>
-            <p>Адрес доставки: {order.address}</p>
-            <p>Статус заказа: {order.status}</p>
-            <p>Дата создания: {order.createdAt}</p>
-            <p>Общая сумма заказа: {order.totalPrice}</p>
-
-            <h3>Товары:</h3>
-            <table className="table table-bordered">
-                <thead>
-                <tr>
-                    <th>Номер</th>
-                    <th>Название продукта</th>
-                    <th>Количество</th>
-                    <th>Цена</th>
-                    <th>Сумма</th>
-                </tr>
-                </thead>
-                <tbody>
-                    {order.product_ids.map((product) => {
-                        const matchedProduct = crossOptical.find(item => item.id === product[0]);
-                        return (
-                            <tr key={product[0]}>
-                                <td>{product[0]}</td>
-                                <td>{matchedProduct ? matchedProduct.name : 'Название не найдено'}</td>
-                                <td>{product[1]}</td>
-                                <td>{matchedProduct ? matchedProduct.price : 'Цена не найдена'}</td>
-                                <td>{matchedProduct ? matchedProduct.price * product[1] : 'Сумма не найдена'}</td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
-
-            {/* Добавьте кнопку "Назад" */}
-            <button className="btn btn-primary mb-5 mt-3" onClick={handleGoBack}>
-                Назад к заказам
-            </button>
-        </div>
+        <ThemeProvider theme={theme}>
+            <Container className="mt-5">
+                {isEdit ? renderEditableOrderDetails() : renderOrderDetails() }
+                <Container>
+                    <TableContainer>
+                        <Typography variant="h4">Товары:</Typography>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Номер</TableCell>
+                                    <TableCell>Название продукта</TableCell>
+                                    <TableCell>Количество</TableCell>
+                                    <TableCell>Цена</TableCell>
+                                    <TableCell>Сумма</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {order.product_ids.map((product) => {
+                                    const matchedProduct = crossOptical.find(item => item.id === product[0]);
+                                    return (
+                                        <TableRow key={product[0]}>
+                                            <TableCell>{product[0]}</TableCell>
+                                            <TableCell>{matchedProduct ? matchedProduct.name : 'Название не найдено'}</TableCell>
+                                            <TableCell>{product[1]}</TableCell>
+                                            <TableCell>{matchedProduct ? matchedProduct.price : 'Цена не найдена'}</TableCell>
+                                            <TableCell>{matchedProduct ? matchedProduct.price * product[1] : 'Сумма не найдена'}</TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                        <Container className='d-flex gap-5'>
+                            <Button variant="contained" color="warning" className="mb-5 mt-3" onClick={handleGoBack}>
+                                Назад к заказам
+                            </Button>
+                            {isEdit ? (
+                                <Button variant="contained" color='success' className="mb-5 mt-3" onClick={editOrder}>
+                                    Сохранить
+                                </Button>
+                            ) : (
+                                <Button variant="contained" color="info" className="mb-5 mt-3" onClick={setButton}>
+                                    Изменить
+                                </Button>
+                            )}
+                        </Container>
+                    </TableContainer>
+                </Container>
+            </Container>
+        </ThemeProvider>
     );
 };
 
