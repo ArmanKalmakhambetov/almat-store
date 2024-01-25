@@ -198,28 +198,28 @@ export const addToCartProductAction = (item) => async (dispatch) => {
 };
 
 export const incrementAction = (id, updatedData) => async (dispatch) => {
-    console.log("Increment Action запустился")
+
 
     dispatch(incrementReducer({id, updatedData}));
-    console.log("Updated data from Action", updatedData)
+
 };
 
 export const isAuthAction = (isAuth) => async (dispatch) => {
-    console.log("is Auth Action запустился")
+
 
     dispatch(isAuthReducer(isAuth));
 
 };
 
 export const decrementAction = (id, updatedData) => async (dispatch) => {
-    console.log("Decrement Action запустился")
+
 
     dispatch(decrementReducer({id, updatedData}));
-    console.log("Updated data from decrement Action", updatedData)
+
 };
 
 export const createOrderAction = (data, userCartIds) => async (dispatch) => {
-    console.log("Create Action запустился", data, userCartIds)
+
 
     try {
         const response = await axios.post(`http://localhost:8000/api/store/createorder`, {
@@ -230,7 +230,7 @@ export const createOrderAction = (data, userCartIds) => async (dispatch) => {
             product_ids: userCartIds,
             totalPrice: data.totalPrice
         })
-        console.log("response from action ", response.data);
+
         // dispatch(getAllUsersPostsReducer(response.data));
 
     } catch (error) { // Handle errors, e.g., by returning an error object
@@ -258,17 +258,37 @@ export const editOrderAction = (data, orderId) => async (dispatch) => {
 
 };
 
+// try{
+//     axios.post(`${END_POINT}/api/createpost`, formData, {
+//         headers: {
+//             'Authorization': `Bearer ${token}`,
+//             'Content-Type': 'multipart/form-data',
+//         },
+//     })
+//         .then((response) => {
+//             console.log('File uploaded successfully:', response.data);
+//             dispatch(createPost(response.data))
+//         })
+//         .catch((error) => {
+//             console.error('Error uploading file:', error);
+//         });
+// }
+
 export const createProductAction = (data) => async (dispatch) => {
-    console.log('Create Product Action запустился', data.productImage)
+    for (const value of data.values()) {
+        console.log('formData Values from slice',value);
+    }
+
+
     try {
-        const response = await axios.post(`http://localhost:8000/api/store/createproduct`, {
-            mainType: data.productMainType,
-            type: data.productType,
-            name: data.productName,
-            price: data.productPrice,
-            image: data.productImage,
+        const response = await axios.post(`http://localhost:8000/api/store/createproduct`, data,
+
+            {
+                headers: {
+                'Content-Type': 'multipart/form-data',
+            }
         })
-        console.log("response from action ", response.data.image);
+
 
     } catch (error) { // Handle errors, e.g., by returning an error object
         throw error;
@@ -293,10 +313,10 @@ export const getAllProductsAction = () => async (dispatch) => {
 
     try {
         const response = await axios.get(`http://localhost:8000/api/store/allproducts`);
-        console.log(response.data)
+
         dispatch(getAllProductsReducer(response.data));
 
-    } catch (error) { // Handle errors, e.g., by returning an error object
+    } catch (error) {
         throw error;
     }
 
@@ -306,7 +326,7 @@ export const getOrderAction = (orderId) => async (dispatch) => {
 
     try {
         const response = await axios.get(`http://localhost:8000/api/store/order/${orderId}`);
-        console.log(response.data)
+
         dispatch(getOrderReducer(response.data));
 
     } catch (error) { // Handle errors, e.g., by returning an error object

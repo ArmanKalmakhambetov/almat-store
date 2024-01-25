@@ -17,7 +17,6 @@ export default function Pizzas() {
     const [selectedMainType, setSelectedMainType] = useState('');
     const host ='http://localhost:8000';
 
-    console.log(crossOptical)
 
     useEffect(() => {
         dispatch(getAllProductsAction());
@@ -60,7 +59,18 @@ export default function Pizzas() {
                                 <div key={index} className="pizza__item d-flex flex-column gap-5 col-lg-3">
                                     <div className="pizza__item-start">
                                         <Button className="pizza__img-button">
-                                            <Image src={`${host}${item.image}`} width={200} height={200} alt="Product image" />
+                                            {item.image.split(',').map((imageUrl, imageIndex) => {
+                                                const trimmedUrl = `${host}${imageUrl.trim()}`;
+                                                console.log(trimmedUrl);
+
+                                                return(
+                                                    <div key={imageIndex}>
+                                                        <Image src={trimmedUrl} width={200} height={200} alt="Product image" />
+                                                    </div>
+                                                )
+
+                                            })}
+
                                         </Button>
                                         <Typography variant="h6" className="pizza__item-title">
                                             {item.name}
@@ -91,5 +101,4 @@ export default function Pizzas() {
 //TODO: обновление в реальном времени заказа
 //TODO: сортировка/фильтрация и поиск
 //TODO: корзину и оформление заказа как в леруа
-//TODO: разобраться с отображением изображений из базы
 //TODO: Создать переменную в product slice url и проставить его во всех запросах

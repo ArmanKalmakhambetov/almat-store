@@ -8,7 +8,7 @@ import {
     clearCartAction,
 } from '@/store/slices/productSlice';
 import { useRouter } from 'next/navigation';
-import cartLogo from '../../../public/image/cart/d-cart.c259d025.svg';
+import cartLogo from '../../../public/image/logo/telezhka_pbuneqj5o42t_256.png';
 import Image from 'next/image';
 import {
     Button,
@@ -23,7 +23,6 @@ import {
 export default function Cart() {
     const data = useSelector((state) => state.usercart.userCart) || null;
     const [updatedData, setUpdatedData] = useState(data);
-    console.log('Data', data);
     const dispatch = useDispatch();
     const router = useRouter();
 

@@ -20,7 +20,7 @@ const OrderDetails = ({ orderId, onGoBack }) => {
     const crossOptical = useSelector(state => state.usercart.allProducts);
     const allOrders = useSelector((state) => state.usercart.allOrders || []);
     const orderFromDb = useSelector(state => state.usercart.order[0]);
-    const order = allOrders.find(item => item.id === orderId);
+    const order = allOrders.find(item => item.id === orderId) || orderFromDb;
     const [isEdit, setIsEdit] = useState(false);
     const [editedOrder, setEditedOrder] = useState({
         username: order.username,
@@ -30,11 +30,13 @@ const OrderDetails = ({ orderId, onGoBack }) => {
         totalPrice: order.totalPrice,
     });
 
+    console.log('Order State:', order);
+
     useEffect(() => {
         dispatch(getAllOrdersAction());
         dispatch(getAllProductsAction());
         dispatch(getOrderAction(orderId))
-    }, [dispatch, allOrders]);
+    }, [dispatch]);
 
 
 
@@ -43,10 +45,11 @@ const OrderDetails = ({ orderId, onGoBack }) => {
         onGoBack();
     };
 
-    const editOrder = () => {
-        dispatch(editOrderAction(editedOrder, orderId));
-        dispatch(getOrderAction(orderId))
+    const editOrder = async () => {
+        await dispatch(editOrderAction(editedOrder, orderId));
+        await dispatch(getOrderAction(orderId));
         setIsEdit(false);
+
     };
 
     const setButton = () => {
@@ -73,10 +76,10 @@ const OrderDetails = ({ orderId, onGoBack }) => {
     const renderEditableOrderDetails = () => (
         <Container>
             <Typography variant="h4">Детали заказа</Typography>
-            <Typography className='mb-3 mt-3'>Номер заказа: {order.id}</Typography>
+            <Typography className='mb-3 mt-3'>Номер заказа: {editedOrder.id}</Typography>
             <Typography className='mb-3 '>
                 <TextField
-                    defaultValue={order.username}
+                    defaultValue={editedOrder.username}
                     label="Имя"
                     onChange={(e) => handleInputChange('username', e.target.value)}
                     className='mb-3'
@@ -85,7 +88,7 @@ const OrderDetails = ({ orderId, onGoBack }) => {
             <Typography className='mb-3'>
                 <TextField
                     label="Телефон"
-                    defaultValue={order.phone}
+                    defaultValue={editedOrder.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
                     className='mb-3'
                 />
@@ -93,7 +96,7 @@ const OrderDetails = ({ orderId, onGoBack }) => {
             <Typography className='mb-3'>
                 <TextField
                     label="Адрес доставки"
-                    defaultValue={order.address}
+                    defaultValue={editedOrder.address}
                     onChange={(e) => handleInputChange('address', e.target.value)}
                     className='mb-3'
                 />
@@ -101,7 +104,7 @@ const OrderDetails = ({ orderId, onGoBack }) => {
             <Typography className='mb-3'>
                 <TextField
                     label="Статус заказа"
-                    defaultValue={order.status}
+                    defaultValue={editedOrder.status}
                     onChange={(e) => handleInputChange('status', e.target.value)}
                     className='mb-3'
                 />
@@ -109,7 +112,7 @@ const OrderDetails = ({ orderId, onGoBack }) => {
             <Typography className='mb-3'>
                 <TextField
                     label="Общая сумма"
-                    defaultValue={order.totalPrice}
+                    defaultValue={editedOrder.totalPrice}
                     onChange={(e) => handleInputChange('totalPrice', e.target.value)}
                     className='mb-3'
                 />
