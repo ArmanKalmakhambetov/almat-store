@@ -13,21 +13,19 @@ const AddProductForm = () => {
     const [productType, setProductType] = useState('');
     const [productName, setProductName] = useState('');
     const [productPrice, setProductPrice] = useState('');
-    // const [productImage, setProductImage] = useState(null); // State to store the file
+    const [productImage, setProductImage] = useState(null);
     const dispatch = useDispatch();
+    const formData = new FormData();
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const formData = new FormData();
+
         formData.append('productMainType', productMainType);
         formData.append('productType', productType);
         formData.append('productName', productName);
         formData.append('productPrice', productPrice);
-        // formData.append('productImage', productImage);
-
-        console.log({ productPrice });
-        console.log(Object.fromEntries(formData));
+        formData.append('productImage', productImage);
 
         dispatch(createProductAction(Object.fromEntries(formData)));
 
@@ -35,13 +33,13 @@ const AddProductForm = () => {
         setProductMainType('');
         setProductType('');
         setProductPrice('');
-        // setProductImage(null);
+        setProductImage(null);
     };
 
-    // const handleFileChange = (e) => {
-    //   const file = e.target.files[0];
-    //   setProductImage(file);
-    // };
+    const handleFileChange = (e) => {
+      const file = e.target.files[0];
+      setProductImage(file);
+    };
 
     return (
         <Container>
@@ -79,12 +77,12 @@ const AddProductForm = () => {
                     onChange={(e) => setProductPrice(e.target.value)}
                     required
                 />
-                {/*<input*/}
-                {/*  type="file"*/}
-                {/*  onChange={handleFileChange}*/}
-                {/*  accept="image/*" // Only images*/}
-                {/*  required*/}
-                {/*/>*/}
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  accept="image/*" // Only images
+                  required
+                />
                 <Button type="submit" variant="contained" color="primary">
                     Добавить продукт
                 </Button>

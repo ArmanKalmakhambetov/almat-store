@@ -259,15 +259,16 @@ export const editOrderAction = (data, orderId) => async (dispatch) => {
 };
 
 export const createProductAction = (data) => async (dispatch) => {
-    console.log('Create Product Action запустился', data.productMainType)
+    console.log('Create Product Action запустился', data.productImage)
     try {
         const response = await axios.post(`http://localhost:8000/api/store/createproduct`, {
             mainType: data.productMainType,
             type: data.productType,
             name: data.productName,
             price: data.productPrice,
+            image: data.productImage,
         })
-        console.log("response from action ", response.data);
+        console.log("response from action ", response.data.image);
 
     } catch (error) { // Handle errors, e.g., by returning an error object
         throw error;

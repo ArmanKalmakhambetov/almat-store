@@ -10,7 +10,6 @@ export default function Admin() {
     const [component, setComponent] = useState('');
     const router = useRouter();
     const isAuth = useSelector((state) => state.usercart.isAuth);
-
     const handleUnauthorizedAccess = () => {
         router.push('/login');
     };

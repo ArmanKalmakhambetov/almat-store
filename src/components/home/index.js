@@ -6,6 +6,7 @@ import Header from "@/components/header";
 import { getAllProductsAction, addToCartProductAction} from '@/store/slices/productSlice';
 import Image from "next/image";
 
+
 const theme = createTheme();
 
 export default function Pizzas() {
@@ -14,6 +15,9 @@ export default function Pizzas() {
     const crossOptical = useSelector((state) => state.usercart.allProducts);
     const uniqueMainTypes = [...new Set(crossOptical.map((item) => item.mainType))];
     const [selectedMainType, setSelectedMainType] = useState('');
+    const host ='http://localhost:8000';
+
+    console.log(crossOptical)
 
     useEffect(() => {
         dispatch(getAllProductsAction());
@@ -35,6 +39,7 @@ export default function Pizzas() {
         <ThemeProvider theme={theme}>
             <>
                 <Header clickCount={clickCount} />
+
                 <Container>
                     <Stack direction="row" spacing={2}>
                         {crossOptical
@@ -55,7 +60,7 @@ export default function Pizzas() {
                                 <div key={index} className="pizza__item d-flex flex-column gap-5 col-lg-3">
                                     <div className="pizza__item-start">
                                         <Button className="pizza__img-button">
-                                            <Image src={img_cross} width={200} height={200} alt="Product image" />
+                                            <Image src={`${host}${item.image}`} width={200} height={200} alt="Product image" />
                                         </Button>
                                         <Typography variant="h6" className="pizza__item-title">
                                             {item.name}
