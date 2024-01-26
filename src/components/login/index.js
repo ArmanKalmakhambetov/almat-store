@@ -41,6 +41,7 @@ export default function Login() {
                                 type="text"
                                 id="username"
                                 className="form-control"
+                                autoComplete='admin'
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 required
@@ -52,6 +53,7 @@ export default function Login() {
                                 type="password"
                                 id="password"
                                 className="form-control"
+                                autoComplete='root'
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required

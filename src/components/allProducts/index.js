@@ -1,17 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {Button, Container, Typography, Divider, ThemeProvider, createTheme, Stack} from "@mui/material";
-import img_cross from '../../../../store-back/public/cable/cros_optical.png';
-import Header from "@/components/header";
-import { getAllProductsAction, addToCartProductAction} from '@/store/slices/productSlice';
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {addToCartProductAction, getAllProductsAction, getAllProductsReducer} from "@/store/slices/productSlice";
+import {Button, Container, Divider, Stack, ThemeProvider, createTheme, Typography} from "@mui/material";
 import Image from "next/image";
-
+import OrderDetails from "@/components/orderDetails";
+import ProductDetails from "@/components/productDetails";
 
 const theme = createTheme();
 
-export default function Pizzas() {
+const AllProducts = () => {
     const dispatch = useDispatch();
-    const [clickCount, setClickCount] = useState(0);
     const [selectedMainType, setSelectedMainType] = useState('');
     const crossOptical = useSelector((state) => state.usercart.allProducts);
     const filteredCrossOptical = crossOptical.filter((item) => item.mainType === selectedMainType);
@@ -19,12 +17,12 @@ export default function Pizzas() {
         ? [...filteredCrossOptical].sort((a, b) => a.id - b.id)
         : [];
     const uniqueMainTypes = [...new Set(crossOptical.map((item) => item.mainType))];
-
-    const host ='http://localhost:8000';
-
+    const [selectedProductId, setSelectedProductId] = useState(null);
+    const host = 'http://localhost:8000/';
 
     useEffect(() => {
         dispatch(getAllProductsAction());
+        console.log(crossOptical)
         setSelectedMainType(uniqueMainTypes[0]);
     }, [crossOptical]);
 
@@ -32,18 +30,19 @@ export default function Pizzas() {
         setSelectedMainType(mainType);
     };
 
+    const handleSelectProduct = (productId) => {
+        setSelectedProductId(productId);
+    };
 
-
-    const buttonClick = (item) => {
-        setClickCount(clickCount + 1);
-        dispatch(addToCartProductAction(item));
+    const handleGoBack = () => {
+        setSelectedProductId(null);
     };
 
     return (
         <ThemeProvider theme={theme}>
-            <>
-                <Header clickCount={clickCount} />
-
+            {selectedProductId ? (
+                <ProductDetails productId={selectedProductId} onGoBack={handleGoBack}/>
+            ) : (
                 <Container>
                     <Stack direction="row" spacing={2}>
                         {crossOptical
@@ -54,7 +53,7 @@ export default function Pizzas() {
                                 </Button>
                             ))}
                     </Stack>
-                    <Divider />
+                    <Divider/>
                     <div className="pizza">
                         <Typography variant="h4" className="pizza__title">
                             {selectedMainType}
@@ -68,9 +67,10 @@ export default function Pizzas() {
                                                 const trimmedUrl = `${host}${imageUrl.trim()}`;
                                                 console.log(trimmedUrl);
 
-                                                return(
+                                                return (
                                                     <div key={imageIndex}>
-                                                        <Image src={trimmedUrl} width={200} height={200} alt="Product image" />
+                                                        <Image src={trimmedUrl} width={200} height={200}
+                                                               alt="Product image"/>
                                                     </div>
                                                 )
                                             })}
@@ -87,8 +87,8 @@ export default function Pizzas() {
                                         <Typography variant="body1" className="pizza__item-price">
                                             Цена: {item.price}
                                         </Typography>
-                                        <Button onClick={() => buttonClick(item)} className="pizza__item-button">
-                                            Выбрать
+                                        <Button onClick={() => handleSelectProduct(item.id)} className="pizza__item-button">
+                                            Изменить
                                         </Button>
                                     </div>
                                 </div>
@@ -96,15 +96,9 @@ export default function Pizzas() {
                         </div>
                     </div>
                 </Container>
-            </>
+            )}
         </ThemeProvider>
     );
 }
 
-//TODO: поиск по заказам, фильтрация и сортировка
-//TODO: обновление в реальном времени заказа
-//TODO: сортировка/фильтрация и поиск
-//TODO: slider
-//TODO: CRUD for admin product
-//TODO: корзину и оформление заказа как в леруа
-//TODO: Создать переменную в product slice url и проставить его во всех запросах
+export default AllProducts;

@@ -5,6 +5,7 @@ import AddProductForm from '../addProduct';
 import AllOrders from '../allOrders';
 import { useRouter } from 'next/navigation';
 import {useSelector} from "react-redux";
+import AllProducts from "@/components/allProducts";
 
 export default function Admin() {
     const [component, setComponent] = useState('');
@@ -36,12 +37,18 @@ export default function Admin() {
                                 <li className="list-group-item">
                                     <button onClick={() => { handleComponentSet('orders') }} className='btn'>Просмотр заказов</button>
                                 </li>
+                                <li className="list-group-item">
+                                    {/* Добавляем кнопку для переключения на вкладку "Все продукты" */}
+                                    <button onClick={() => { handleComponentSet('allProducts') }} className='btn'>Все продукты</button>
+                                </li>
                             </ul>
                         </div>
                         <div className="col-md-10">
                             <>
                                 {component === 'addProduct' && <AddProductForm onUnauthorizedAccess={handleUnauthorizedAccess} />}
                                 {component === 'orders' && <AllOrders onUnauthorizedAccess={handleUnauthorizedAccess} />}
+                                {/* Добавляем условие для отображения компонента "Все продукты" */}
+                                {component === 'allProducts' && <AllProducts onUnauthorizedAccess={handleUnauthorizedAccess} />}
                             </>
                         </div>
                     </div>

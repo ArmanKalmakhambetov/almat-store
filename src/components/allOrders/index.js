@@ -19,10 +19,12 @@ const ViewOrders = () => {
     const dispatch = useDispatch();
     const [selectedOrderId, setSelectedOrderId] = useState(null);
 
+    // Пример строки даты из вашей базы данных
+
+
     useEffect(() => {
         dispatch(getAllOrdersAction());
-    }, [allOrders]);
-
+    }, [dispatch, allOrders]);
     // Function to handle selecting an order
     const handleSelectOrder = (orderId) => {
         setSelectedOrderId(orderId);

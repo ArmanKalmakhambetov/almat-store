@@ -7,6 +7,8 @@ let initialState = {
     allOrders: [],
     isAuth: false,
     order: {},
+    editedOrder: {},
+    editedProduct: null,
 
 }
 
@@ -72,6 +74,21 @@ export const userPostsSlice = createSlice({
 
         isAuthReducer: (state, action) => {
             state.isAuth = action.payload;
+        },
+
+        editOrderReducer: (state, action) => {
+            state.editedOrder = action.payload;
+            console.log(state.editedOrder)
+        },
+
+        editProductReducer: (state, action) => {
+          state.editedProduct = action.payload;
+            console.log(state.editedProduct);
+        },
+
+        deleteProductReducer: (state, action) => {
+            state.allProducts = state.allProducts.filter(item => item.id !== action.payload);
+            console.log('State from delete', state.allProducts);
         },
 
 
@@ -189,6 +206,10 @@ export const {
     getAllProductsReducer,
     isAuthReducer,
     getOrderReducer,
+    editOrderReducer,
+    editProductReducer,
+    deleteProductReducer,
+
 } = userPostsSlice.actions;
 
 export const addToCartProductAction = (item) => async (dispatch) => {
@@ -241,7 +262,7 @@ export const createOrderAction = (data, userCartIds) => async (dispatch) => {
 
 export const editOrderAction = (data, orderId) => async (dispatch) => {
     console.log("Edit Order Action запустился", data)
-
+    await dispatch(editOrderReducer(data))
     try {
         const response = await axios.post(`http://localhost:8000/api/store/order/${orderId}/editorder`, {
             username: data.username,
@@ -250,6 +271,7 @@ export const editOrderAction = (data, orderId) => async (dispatch) => {
             status: data.status,
             totalPrice: data.totalPrice,
         })
+
         console.log("response from edit order action ", response.data);
 
     } catch (error) { // Handle errors, e.g., by returning an error object
@@ -276,7 +298,7 @@ export const editOrderAction = (data, orderId) => async (dispatch) => {
 
 export const createProductAction = (data) => async (dispatch) => {
     for (const value of data.values()) {
-        console.log('formData Values from slice',value);
+        console.log('formData Values from slice', value);
     }
 
 
@@ -285,11 +307,41 @@ export const createProductAction = (data) => async (dispatch) => {
 
             {
                 headers: {
-                'Content-Type': 'multipart/form-data',
-            }
+                    'Content-Type': 'multipart/form-data',
+                }
+            })
+
+
+    } catch (error) { // Handle errors, e.g., by returning an error object
+        throw error;
+    }
+
+};
+
+export const editProductAction = (mainType, type, name, price, productId) => async (dispatch) => {
+
+    console.log('data from editProduct', mainType, type, name, price)
+
+
+    try {
+        console.log('try ////////////////////////////////')
+        const response = await axios.post(`http://localhost:8000/api/store/product/${productId}`, {
+            mainType, type, name, price, productId
         })
+        dispatch(editProductReducer(response.data))
+        console.log(response.data)
 
+    } catch (error) { // Handle errors, e.g., by returning an error object
+        throw error;
+    }
 
+};
+
+export const deleteProductAction = (productId) => async (dispatch) => {
+    console.log(productId)
+    try {
+        const response = await axios.delete(`http://localhost:8000/api/store/product/${productId}`)
+        dispatch(deleteProductReducer(productId));
     } catch (error) { // Handle errors, e.g., by returning an error object
         throw error;
     }

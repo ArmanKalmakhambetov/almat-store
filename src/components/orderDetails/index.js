@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import {editOrderAction, getAllOrdersAction, getAllProductsAction, getOrderAction} from '@/store/slices/productSlice';
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {ThemeProvider, createTheme} from '@mui/material/styles';
+import {
+    editOrderAction,
+    editOrderReducer,
+    getAllOrdersAction,
+    getAllProductsAction,
+    getOrderAction
+} from '@/store/slices/productSlice';
 import {
     Container,
     Typography,
@@ -13,14 +19,15 @@ import {
     TableRow,
     Button, TextField,
 } from '@mui/material';
+
 const theme = createTheme();
 
-const OrderDetails = ({ orderId, onGoBack }) => {
+const OrderDetails = ({orderId, onGoBack}) => {
     const dispatch = useDispatch();
     const crossOptical = useSelector(state => state.usercart.allProducts);
     const allOrders = useSelector((state) => state.usercart.allOrders || []);
-    const orderFromDb = useSelector(state => state.usercart.order[0]);
-    const order = allOrders.find(item => item.id === orderId) || orderFromDb;
+    const editedOrderFromSlice = useSelector(state => state.usercart.editedOrder);
+    const order = allOrders.find(item => item.id === orderId);
     const [isEdit, setIsEdit] = useState(false);
     const [editedOrder, setEditedOrder] = useState({
         username: order.username,
@@ -30,14 +37,34 @@ const OrderDetails = ({ orderId, onGoBack }) => {
         totalPrice: order.totalPrice,
     });
 
+    // Пример строки даты из вашей базы данных
+    const createdAtFromDB = order.createdAt;
+
+// Создание объекта Date из строки даты
+    const date = new Date(createdAtFromDB);
+
+// Получение компонентов даты
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+// Форматирование в нужный вид
+    const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`;
+
+    console.log(formattedDate);
+
     console.log('Order State:', order);
 
-    useEffect(() => {
+    useEffect(  () => {
+        dispatch(editOrderReducer())
         dispatch(getAllOrdersAction());
         dispatch(getAllProductsAction());
-        dispatch(getOrderAction(orderId))
-    }, [dispatch]);
 
+    }, [dispatch, allOrders]);
+
+    console.log('Edited order', editedOrderFromSlice)
 
 
     // Function to trigger the callback when the "Go Back" button is clicked
@@ -45,10 +72,11 @@ const OrderDetails = ({ orderId, onGoBack }) => {
         onGoBack();
     };
 
-    const editOrder = async () => {
-        await dispatch(editOrderAction(editedOrder, orderId));
-        await dispatch(getOrderAction(orderId));
+    const editOrder = () => {
+        dispatch(editOrderAction(editedOrder, orderId));
+        dispatch(getOrderAction(orderId));
         setIsEdit(false);
+        console.log('all orders ', allOrders)
 
     };
 
@@ -57,21 +85,38 @@ const OrderDetails = ({ orderId, onGoBack }) => {
     };
 
     const handleInputChange = (field, value) => {
-        setEditedOrder(prevState => ({ ...prevState, [field]: value }));
+        setEditedOrder(prevState => ({...prevState, [field]: value}));
     };
 
-    const renderOrderDetails = () => (
-        <Container>
-            <Typography variant="h4">Детали заказа</Typography>
-            <Typography className='mb-3 mt-3'>Номер заказа: {order.id}</Typography>
-            <Typography className='mb-3'>Имя: {order.username}</Typography>
-            <Typography className='mb-3'>Телефон: {order.phone}</Typography>
-            <Typography className='mb-3'>Адрес доставки: {order.address}</Typography>
-            <Typography className='mb-3'>Статус заказа: {order.status}</Typography>
-            <Typography className='mb-3'>Дата создания: {order.createdAt}</Typography>
-            <Typography className='mb-3'>Общая сумма заказа: {order.totalPrice}</Typography>
-        </Container>
-    );
+    const renderOrderDetails = () => {
+        return (
+            <>
+                {editedOrderFromSlice ? (
+                    <Container>
+                        <Typography variant="h4">Детали заказа</Typography>
+                        <Typography className='mb-3 mt-3'>Номер заказа: {editedOrderFromSlice.id}</Typography>
+                        <Typography className='mb-3'>Имя: {editedOrderFromSlice.username}</Typography>
+                        <Typography className='mb-3'>Телефон: {editedOrderFromSlice.phone}</Typography>
+                        <Typography className='mb-3'>Адрес доставки: {editedOrderFromSlice.address}</Typography>
+                        <Typography className='mb-3'>Статус заказа: {editedOrderFromSlice.status}</Typography>
+                        <Typography className='mb-3'>Дата создания: {formattedDate}</Typography>
+                        <Typography className='mb-3'>Общая сумма заказа: {editedOrderFromSlice.totalPrice}</Typography>
+                    </Container>
+                ) : (
+                    <Container>
+                        <Typography variant="h4">Детали заказа</Typography>
+                        <Typography className='mb-3 mt-3'>Номер заказа: {order.id}</Typography>
+                        <Typography className='mb-3'>Имя: {order.username}</Typography>
+                        <Typography className='mb-3'>Телефон: {order.phone}</Typography>
+                        <Typography className='mb-3'>Адрес доставки: {order.address}</Typography>
+                        <Typography className='mb-3'>Статус заказа: {order.status}</Typography>
+                        <Typography className='mb-3'>Дата создания: {formattedDate}</Typography>
+                        <Typography className='mb-3'>Общая сумма заказа: {order.totalPrice}</Typography>
+                    </Container>
+                )}
+            </>
+        )
+    };
 
     const renderEditableOrderDetails = () => (
         <Container>
@@ -123,7 +168,7 @@ const OrderDetails = ({ orderId, onGoBack }) => {
     return (
         <ThemeProvider theme={theme}>
             <Container className="mt-5">
-                {isEdit ? renderEditableOrderDetails() : renderOrderDetails() }
+                {isEdit ? renderEditableOrderDetails() : renderOrderDetails()}
                 <Container>
                     <TableContainer>
                         <Typography variant="h4">Товары:</Typography>

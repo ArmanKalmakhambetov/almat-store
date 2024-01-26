@@ -77,7 +77,7 @@ const AddProductForm = () => {
                 <TextField
                     fullWidth
                     margin="normal"
-                    label="Тип"
+                    label="Категория"
                     value={type}
                     onChange={(e) => setProductType(e.target.value)}
                     required
