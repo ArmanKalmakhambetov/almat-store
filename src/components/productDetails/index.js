@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {ThemeProvider, createTheme} from '@mui/material/styles';
+import { useRef } from 'react';
 import {
     deleteProductAction,
     editOrderAction,
@@ -21,6 +22,7 @@ import {
     Button, TextField,
 } from '@mui/material';
 import allProducts from "@/components/allProducts";
+import {useDropzone} from "react-dropzone";
 
 const theme = createTheme();
 
@@ -31,16 +33,32 @@ const ProductDetails = ({productId, onGoBack}) => {
     const editedProductFromSlice = useSelector(state => state.usercart.editedProduct);
     const product = crossOptical.find(item => item.id === productId);
     const [isEdit, setIsEdit] = useState(false);
+    const inputRef = useRef(null);
+    const host = 'http://localhost:8000/';
     console.log('product id ', productId)
+    const [selectedFiles, setSelectedFiles] = useState([])
     const [editedProduct, setEditedProduct] = useState({
         mainType: product.mainType,
         type: product.type,
         name: product.name,
         price: product.price,
+        image: product.image,
+    });
+
+    const handleFileChange1 = (acceptedFiles) => {
+        setSelectedFiles(acceptedFiles);
+        console.log(selectedFiles)
+    };
+
+    const { getRootProps, getInputProps } = useDropzone({
+        accept: 'image/*', // specify the file types you want to accept
+        multiple: true,
+        maxFiles: 10,
+        onDrop: handleFileChange1,
     });
 
     useEffect(() => {
-        dispatch(editProductReducer())
+        dispatch(editProductReducer());
         dispatch(getAllOrdersAction());
         dispatch(getAllProductsAction());
 
@@ -68,7 +86,13 @@ const ProductDetails = ({productId, onGoBack}) => {
     }, [dispatch, refreshedProducts]);
 
     const editProduct = () => {
-        dispatch(editProductAction(editedProduct.mainType, editedProduct.type, editedProduct.name,editedProduct.price, productId));
+        dispatch(editProductAction(
+            editedProduct.mainType,
+            editedProduct.type,
+            editedProduct.name,
+            editedProduct.price,
+            productId,
+            selectedFiles));
 
         setIsEdit(false);
     };
@@ -157,7 +181,7 @@ const ProductDetails = ({productId, onGoBack}) => {
     //         </Typography>
     //     </Container>
     // );
-
+    console.log(editedProduct.image)
     return (
         <ThemeProvider theme={theme}>
             <Container className="mt-5">
@@ -197,6 +221,28 @@ const ProductDetails = ({productId, onGoBack}) => {
                                 className='mb-3'
                             />
                         </Typography>
+                        <div {...getRootProps()} style={{ cursor: 'pointer', padding: '20px', border: '2px dashed #ddd' }}>
+                            <input {...getInputProps()} ref={inputRef} style={{ display: 'none' }} />
+                            <p>Перетащите сюда файлы или нажмите, чтобы выбрать файлы</p>
+                        </div>
+
+                        {selectedFiles.length > 0 && (
+                            <>
+                                <p>Выбранные файлы:</p>
+                                <ul>
+                                    {selectedFiles.map((file) => (
+                                        <li key={file.name}>{file.name}</li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+
+                        {selectedFiles.length > 0 &&
+                            selectedFiles.map((file) => (
+                                <div key={file.name}>
+                                    <img src={URL.createObjectURL(file)} alt='' width={400} height={300} />
+                                </div>
+                            ))}
                     </Container>
                 ) : (
                     <>
@@ -209,6 +255,7 @@ const ProductDetails = ({productId, onGoBack}) => {
                                 <Typography className='mb-3'>Тип: {editedProductFromSlice.type}</Typography>
                                 <Typography className='mb-3'>Название: {editedProductFromSlice.name}</Typography>
                                 <Typography className='mb-3'>Цена: {editedProductFromSlice.price}</Typography>
+                                <img src={host + editedProductFromSlice.image} alt='alt'></img>
                             </Container>
 
 
@@ -221,6 +268,7 @@ const ProductDetails = ({productId, onGoBack}) => {
                                     <Typography className='mb-3'>Тип: {editedProduct.type}</Typography>
                                     <Typography className='mb-3'>Название: {editedProduct.name}</Typography>
                                     <Typography className='mb-3'>Цена: {editedProduct.price}</Typography>
+                                    <img src= {host + editedProduct.image} alt='alt'></img>
                                 </Container>
                             </>
                         )}

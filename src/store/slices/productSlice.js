@@ -83,7 +83,7 @@ export const userPostsSlice = createSlice({
         },
 
         editProductReducer: (state, action) => {
-          state.editedProduct = action.payload;
+            state.editedProduct = action.payload;
             console.log(state.editedProduct);
         },
 
@@ -319,16 +319,35 @@ export const createProductAction = (data) => async (dispatch) => {
 
 };
 
-export const editProductAction = (mainType, type, name, price, productId) => async (dispatch) => {
+export const editProductAction = (mainType, type, name, price, productId, selectedFiles) => async (dispatch) => {
 
-    console.log('data from editProduct', mainType, type, name, price)
+    console.log('data from editProduct', mainType, type, name, price, selectedFiles)
 
+    const formData = new FormData();
+
+    formData.append('mainType', mainType);
+    formData.append('type', type);
+    formData.append('name', name);
+    formData.append('price', price);
+    selectedFiles.forEach((file) => {
+        console.log(file)
+        formData.append('image', file);
+    });
+
+    for (const formDatum of formData.values()) {
+        console.log(formDatum)
+    }
 
     try {
         console.log('try ////////////////////////////////')
-        const response = await axios.post(`${host}api/store/product/${productId}`, {
-            mainType, type, name, price, productId
-        })
+        const response = await axios.post(`${host}api/store/product/${productId}`, formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            }
+        )
+
         dispatch(editProductReducer(response.data))
         console.log(response.data)
 
