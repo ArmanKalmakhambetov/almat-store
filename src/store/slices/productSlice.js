@@ -11,6 +11,7 @@ let initialState = {
     editedProduct: null,
 
 }
+const host = 'http://localhost:8000/';
 
 export const userPostsSlice = createSlice({
 
@@ -243,7 +244,7 @@ export const createOrderAction = (data, userCartIds) => async (dispatch) => {
 
 
     try {
-        const response = await axios.post(`http://localhost:8000/api/store/createorder`, {
+        const response = await axios.post(`${host}api/store/createorder`, {
             username: data.username,
             phone: data.phone,
             address: data.address,
@@ -264,7 +265,7 @@ export const editOrderAction = (data, orderId) => async (dispatch) => {
     console.log("Edit Order Action запустился", data)
     await dispatch(editOrderReducer(data))
     try {
-        const response = await axios.post(`http://localhost:8000/api/store/order/${orderId}/editorder`, {
+        const response = await axios.post(`${host}api/store/order/${orderId}/editorder`, {
             username: data.username,
             phone: data.phone,
             address: data.address,
@@ -303,7 +304,7 @@ export const createProductAction = (data) => async (dispatch) => {
 
 
     try {
-        const response = await axios.post(`http://localhost:8000/api/store/createproduct`, data,
+        const response = await axios.post(`${host}api/store/createproduct`, data,
 
             {
                 headers: {
@@ -325,7 +326,7 @@ export const editProductAction = (mainType, type, name, price, productId) => asy
 
     try {
         console.log('try ////////////////////////////////')
-        const response = await axios.post(`http://localhost:8000/api/store/product/${productId}`, {
+        const response = await axios.post(`${host}api/store/product/${productId}`, {
             mainType, type, name, price, productId
         })
         dispatch(editProductReducer(response.data))
@@ -340,7 +341,7 @@ export const editProductAction = (mainType, type, name, price, productId) => asy
 export const deleteProductAction = (productId) => async (dispatch) => {
     console.log(productId)
     try {
-        const response = await axios.delete(`http://localhost:8000/api/store/product/${productId}`)
+        const response = await axios.delete(`${host}api/store/product/${productId}`)
         dispatch(deleteProductReducer(productId));
     } catch (error) { // Handle errors, e.g., by returning an error object
         throw error;
@@ -352,7 +353,7 @@ export const deleteProductAction = (productId) => async (dispatch) => {
 export const getAllOrdersAction = () => async (dispatch) => {
 
     try {
-        const response = await axios.get(`http://localhost:8000/api/store/allorders`);
+        const response = await axios.get(`${host}api/store/allorders`);
         dispatch(getAllOrdersReducer(response.data));
 
     } catch (error) { // Handle errors, e.g., by returning an error object
@@ -364,7 +365,7 @@ export const getAllOrdersAction = () => async (dispatch) => {
 export const getAllProductsAction = () => async (dispatch) => {
 
     try {
-        const response = await axios.get(`http://localhost:8000/api/store/allproducts`);
+        const response = await axios.get(`${host}api/store/allproducts`);
 
         dispatch(getAllProductsReducer(response.data));
 
@@ -377,7 +378,7 @@ export const getAllProductsAction = () => async (dispatch) => {
 export const getOrderAction = (orderId) => async (dispatch) => {
 
     try {
-        const response = await axios.get(`http://localhost:8000/api/store/order/${orderId}`);
+        const response = await axios.get(`${host}api/store/order/${orderId}`);
 
         dispatch(getOrderReducer(response.data));
 
