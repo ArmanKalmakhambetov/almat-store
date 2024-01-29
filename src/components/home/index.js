@@ -1,22 +1,41 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Button, Container, Typography, Divider, ThemeProvider, createTheme, Stack } from "@mui/material";
+import React, {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {
+    Button,
+    Container,
+    Typography,
+    Divider,
+    ThemeProvider,
+    createTheme,
+    Stack,
+    MenuItem,
+    FormControl,
+    Select
+} from "@mui/material";
 import Header from "@/components/header";
-import { getAllProductsAction, addToCartProductAction } from '@/store/slices/productSlice';
+import {getAllProductsAction, addToCartProductAction} from '@/store/slices/productSlice';
 import Image from "next/image";
+import sort from '../../../public/image/cable/sort.png';
 
 const theme = createTheme();
+
 
 export default function Pizzas() {
     const dispatch = useDispatch();
     const [clickCount, setClickCount] = useState(0);
     const [selectedMainType, setSelectedMainType] = useState('');
+    const [selectedType, setSelectedType] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('');
     const crossOptical = useSelector((state) => state.usercart.allProducts);
-    const uniqueMainTypes = [...new Set(crossOptical.map((item) => item.mainType))];
-
     const host = 'http://localhost:8000';
+    const [sortState, setSortState] = useState('');
+
+    // Extract uniqueMainTypes and uniqueTypes based on the selectedMainType
+    const uniqueMainTypes = [...new Set(crossOptical.map((item) => item.mainType))];
+    const uniqueTypes = selectedMainType
+        ? [...new Set(crossOptical.filter((item) => item.mainType === selectedMainType).map((item) => item.type))]
+        : [];
 
     useEffect(() => {
         dispatch(getAllProductsAction());
@@ -25,6 +44,11 @@ export default function Pizzas() {
 
     const handleNavItemClick = (mainType) => {
         setSelectedMainType(mainType);
+        setSelectedType(''); // Reset selectedType when changing mainType
+    };
+
+    const handleTypeChange = (event) => {
+        setSelectedType(event.target.value);
     };
 
     const handleSearchTermChange = (event) => {
@@ -40,38 +64,79 @@ export default function Pizzas() {
         dispatch(addToCartProductAction(item));
     };
 
-    const filteredCrossOptical = crossOptical.filter((item) => item.mainType === selectedMainType);
-    const sortedCrossOptical = filteredCrossOptical
-        ? [...filteredCrossOptical].sort((a, b) => a.id - b.id)
-        : [];
-
-    const filteredProducts = sortedCrossOptical.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const sortedProducts = filteredProducts.sort((a, b) => {
-        if (sortBy === 'asc') {
-            return a.price - b.price;
-        } else if (sortBy === 'desc') {
-            return b.price - a.price;
+    const setActiveState = (number) => {
+        if (sortState == '1') {
+            setSortState('2')
+        } else {
+            setSortState(number)
         }
-        return 0;
-    });
+        console.log(sortState)
+
+    }
+
+    const filteredMainType = crossOptical.filter((item) => item.mainType === selectedMainType);
+
+    const filteredByType = selectedType
+        ? filteredMainType.filter((item) => item.type === selectedType)
+        : filteredMainType;
+
+    const sortedProducts = filteredByType
+        .filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        .sort((a, b) => {
+            if (sortState === '1') {
+                return a.price - b.price;
+            } else if (sortState === '2') {
+                return b.price - a.price;
+            }
+            return 0;
+        });
 
     return (
         <ThemeProvider theme={theme}>
             <>
-                <Header clickCount={clickCount} />
+                <Header clickCount={clickCount}/>
 
                 <Container>
-                    <Stack direction="row" spacing={2}>
-                        {uniqueMainTypes.map((uniqueItem) => (
-                            <Button key={uniqueItem} onClick={() => handleNavItemClick(uniqueItem)}>
-                                {uniqueItem}
-                            </Button>
-                        ))}
-                    </Stack>
-                    <Divider />
+                    <FormControl>
+                        <Select
+                            value={selectedMainType}
+                            onChange={(event) => handleNavItemClick(event.target.value)}
+                            displayEmpty
+                        >
+                            <MenuItem value="" disabled>
+                                Select Main Type
+                            </MenuItem>
+                            {uniqueMainTypes.map((uniqueItem) => (
+                                <MenuItem key={uniqueItem} value={uniqueItem}>
+                                    {uniqueItem}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    {selectedMainType && (
+                        <FormControl>
+                            <Select
+                                value={selectedType}
+                                onChange={handleTypeChange}
+                                displayEmpty
+                            >
+                                <MenuItem value="" disabled>
+                                    Select Type
+                                </MenuItem>
+                                <MenuItem value="">
+                                    Show All Types
+                                </MenuItem>
+                                {uniqueTypes.map((type) => (
+                                    <MenuItem key={type} value={type}>
+                                        {type}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    )}
+
+                    <Divider/>
 
                     <div className="pizza">
                         <Typography variant="h4" className="pizza__title">
@@ -94,11 +159,10 @@ export default function Pizzas() {
                         </div>
 
                         <div className="mb-3">
-                            <select className="form-select" value={sortBy} onChange={handleSortChange}>
-                                <option value="">Sort by</option>
-                                <option value="asc">Price: Low to High</option>
-                                <option value="desc">Price: High to Low</option>
-                            </select>
+                            <Button onClick={() => setActiveState('1')}>
+                                <Image src={sort} alt='alt'></Image>
+
+                            </Button>
                         </div>
 
                         <div className="pizza__body row">
@@ -112,7 +176,8 @@ export default function Pizzas() {
 
                                                 return (
                                                     <div key={imageIndex}>
-                                                        <Image src={trimmedUrl} width={200} height={200} alt="Product image" />
+                                                        <Image src={trimmedUrl} width={200} height={200}
+                                                               alt="Product image"/>
                                                     </div>
                                                 )
                                             })}
